@@ -28,7 +28,10 @@ set linesize 255
 ************* 1. Definition of Globals *********************************
 ************************************************************************
 
-global researcher == ""
+global researcher "Maria"
+
+
+
 
 if "$researcher" == "Alessandro" {
 
@@ -47,16 +50,19 @@ global GRAPH "$WORKDIR\05_tables"
 
 if "$researcher" == "Maria" {
 
-global WORKDIR "Z:\Eigene Dateien\Migrants and Education\03 Analysis"
+global WORKDIR "Z:Eigene Dateien\GitHub\CILS4EU_mig\03 Analysis"
 
-global DATA "$WORKDIR\01_data" 
-global TEMP "$WORKDIR\01_data\TEMP"
+
+global DATA "Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data" 
+global TEMP "Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\01_data\TEMP"
 global DO "$WORKDIR\02_code"
 global LOG     "$WORKDIR\03_log" /* hier soll das log-file gespeichert werden */
 global DESC "$WORKDIR\04_graphs"
 global GRAPH "$WORKDIR\05_tables"
 
 }
+
+
 
 
 
