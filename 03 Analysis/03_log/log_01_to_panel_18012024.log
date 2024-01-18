@@ -1,0 +1,830 @@
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+      name:  <unnamed>
+       log:  Z:\Eigene Dateien\Migrants and Education\03 Analysis\03_log\log_01_to_panel_18012024.log
+  log type:  text
+ opened on:  18 Jan 2024, 09:43:11
+
+. 
+. 
+. 
+. * relationship information 
+. use "$DATA/w6_ylhcp_ge_v6.0.0_rv.dta", clear
+(30 Jul 2021)
+
+. describe
+
+Contains data from Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data/w6_ylhcp_ge_v6.0.0_rv.dta
+ Observations:         5,370                  30 Jul 2021
+    Variables:            59                  30 Jul 2021 15:18
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+youthid         long    %32.0g     youthid    unique youth id
+youthid_ge      byte    %32.0g     youthid_ge
+                                              national youth id (germany)
+country         byte    %32.0g     country    country of survey
+y6_status       byte    %32.0g     y6_status
+                                              mode of youth lhc partner interview
+y6_version      byte    %32.0g     y6_version
+                                              version of youth lhc partner interview
+y6_sample       byte    %32.0g     y6_sample
+                                              sample
+y6_intdat_ylhcp byte    %4.0f      y6_intdat_ylhcp
+                                              date of survey
+y6_intdat_ylh~V int     %tm        y6_intdat_ylhcpRV
+                                              date of survey (reduced version)
+y6_vers_ylhcp   str21   %21s                  data release version of youth lhc partner interview
+y6_rpindex      byte    %32.0g     y6_rpindex
+                                              unique partner index
+y6_rpsex        byte    %32.0g     y6_rpsex   rp1: sex of partner
+y6_rpdobm       byte    %32.0g     y6_rpdobm
+                                              rp2: when was partner born: month
+y6_rpdoby       byte    %32.0g     y6_rpdoby
+                                              rp2: when was partner born: year
+y6_rpdobyRV     int     %32.0g     y6_rpdobyRV
+                                              rp2: when was partner born: year (reduced version)
+y6_rp1startm    byte    %32.0g     y6_rp1startm
+                                              rp3: start of relationship (month)
+y6_rp1starty    byte    %32.0g     y6_rp1starty
+                                              rp3: start of relationship (year)
+y6_rp1startyRV  int     %32.0g     y6_rp1startyRV
+                                              rp3: start of relationship (year) (reduced version)
+y6_rp1checkbdat byte    %38.0g     y6_rp1checkbdat
+                                              rp4: january 2011: did i record that correctly
+y6_rp1endm      byte    %32.0g     y6_rp1endm
+                                              rp5: end of relationship (month)
+y6_rp1endy      int     %32.0g     y6_rp1endy
+                                              rp5: end of relationship (year)
+y6_rp1ongoing   byte    %32.0g     y6_rp1ongoing
+                                              rp5: relationship is still on-going
+y6_rp2relship   byte    %32.0g     y6_rp2relship
+                                              rp6: together with partner at other point in time, first other time
+y6_rp2startm    byte    %32.0g     y6_rp2startm
+                                              rp7: start of relationship (month), first other time
+y6_rp2starty    int     %32.0g     y6_rp2starty
+                                              rp7: start of relationship (year), first other time
+y6_rp2endm      byte    %32.0g     y6_rp2endm
+                                              rp8: end of relationship (month), first other time
+y6_rp2endy      int     %32.0g     y6_rp2endy
+                                              rp8: end of relationship (year), first other time
+y6_rp2ongoing   byte    %32.0g     y6_rp2ongoing
+                                              rp8: relationship is still on-going, first other time
+y6_rp3relship   byte    %32.0g     y6_rp3relship
+                                              rp9: together with partner at other point in time, second other time
+y6_rp3startm    byte    %32.0g     y6_rp3startm
+                                              rp10: start of relationship (month), second other time
+y6_rp3starty    int     %32.0g     y6_rp3starty
+                                              rp10: start of relationship (year), second other time
+y6_rp3endm      byte    %32.0g     y6_rp3endm
+                                              rp11: end of relationship (month), second other time
+y6_rp3endy      int     %32.0g     y6_rp3endy
+                                              rp11: end of relationship (year), second other time
+y6_rp3ongoing   byte    %32.0g     y6_rp3ongoing
+                                              rp11: relationship is still on-going, second other time
+y6_rp4relship   byte    %32.0g     y6_rp4relship
+                                              rp12: together with partner at other point in time, third other time
+y6_rpeduc8      byte    %35.0g     y6_rpeduc8
+                                              rp13: was partner in school at beginning of relationship
+y6_rpeduc9      byte    %62.0g     y6_rpeduc9
+                                              rp14: which educational degree did partner have at beginning of relationship
+y6_rpeduc9op    str36   %36s                  rp14: which educational degree did partner have at beginning, other degree
+y6_rpeduc9_add  str36   %36s                  rp14: which educational degree did partner have at beginning, additional inform.
+y6_rpsit2a      byte    %129.0g    y6_rpsit2a
+                                              rp15: what type of education did he/she do at beginning of relationship
+y6_rpsit2aop    str36   %36s                  rp15: what type of education did he/she do at beginning, other education
+y6_rpsit2aopRV  str72   %72s                  rp15: what type of educ. did he/she do at beg., other educ. (reduced version)
+y6_rpsit2a_add  str36   %36s                  rp15: what type of education did he/she do at beginning, additional information
+y6_rpback2      byte    %52.0g     y6_rpback2
+                                              rp16: what is his/her background
+y6_rpback2RV    byte    %32.0g     y6_rpback2RV
+                                              rp16: what is his/her background (reduced version)
+y6_rpback2_add  str36   %36s                  rp16: what is his/her background, additional information
+y6_rpcohab      byte    %32.0g     y6_rpcohab
+                                              rp17: lived together with partner
+y6_rpcohabsta~m byte    %32.0g     y6_rpcohabstartm
+                                              rp18: start of cohabitation with partner: month
+y6_rpcohabsta~y byte    %32.0g     y6_rpcohabstarty
+                                              rp18: start of cohabitation with partner: year
+y6_rpcohabsta~V int     %32.0g     y6_rpcohabstartyRV
+                                              rp18: start of cohabitation with partner: year (reduced version)
+y6_rpcohabendm  byte    %32.0g     y6_rpcohabendm
+                                              rp19: end of cohabitation with partner: month
+y6_rpcohabendy  int     %32.0g     y6_rpcohabendy
+                                              rp19: end of cohabitation with partner: year
+y6_rpcohab_on~g byte    %32.0g     y6_rpcohab_ongoing
+                                              rp19: still lives together with partner
+y6_rpmarst4     byte    %32.0g     y6_rpmarst4
+                                              rp20: married to partner
+y6_rpmarstartm  byte    %32.0g     y6_rpmarstartm
+                                              rp21: start of marriage with partner: month
+y6_rpmarstarty  byte    %32.0g     y6_rpmarstarty
+                                              rp21: start of marriage with partner: year
+y6_rpmarstart~V int     %32.0g     y6_rpmarstartyRV
+                                              rp21: start of marriage with partner: year (reduced version)
+y6_rpmarendm    byte    %32.0g     y6_rpmarendm
+                                              rp22: end of marriage with partner: month
+y6_rpmarendy    int     %32.0g     y6_rpmarendy
+                                              rp22: end of marriage with partner: year
+y6_rpmar_ongo~g byte    %32.0g     y6_rpmar_ongoing
+                                              rp22: still married to partner
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Sorted by: youthid
+
+. 
+. * education and profession 
+. use "$DATA/w6_ylhcs_ge_v6.0.0_rv.dta", clear
+(30 Jul 2021)
+
+. describe
+
+Contains data from Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data/w6_ylhcs_ge_v6.0.0_rv.dta
+ Observations:        25,008                  30 Jul 2021
+    Variables:           280                  30 Jul 2021 15:19
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Variable      Storage   Display    Value
+    name         type    format    label      Variable label
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+youthid         long    %32.0f     youthid    unique youth id
+youthid_ge      byte    %32.0g     youthid_ge
+                                              national youth id (germany)
+country         byte    %32.0g     country    country of survey
+y6_status       byte    %32.0g     y6_status
+                                              mode of youth structural lhc interview
+y6_version      byte    %32.0g     y6_version
+                                              version of youth structural lhc interview
+y6_sample       byte    %32.0g     y6_sample
+                                              sample
+y6_intdat_ylhcs byte    %4.0f      y6_intdat_ylhcs
+                                              date of survey
+y6_intdat_ylh~V int     %tm        y6_intdat_ylhcsRV
+                                              date of survey (reduced version)
+y6_vers_ylhcs   str21   %21s                  data release version of youth structural lhc interview
+y6_ylhcs_mode   byte    %32.0g     y6_ylhcs_mode
+                                              mode of spell entry
+y6_ylhcs_index  byte    %32.0g     y6_ylhcs_index
+                                              unique personal spell index
+y6_ylhcs_spt1   byte    %32.0g     y6_ylhcs_spt1
+                                              spell type (first level)
+y6_ylhcs_spt2   byte    %43.0g     y6_ylhcs_spt2
+                                              spell type (second level)
+y6_ylhcs_begd~m byte    %32.0g     y6_ylhcs_begdatm
+                                              start of spell (month)
+y6_ylhcs_begd~y int     %32.0g     y6_ylhcs_begdaty
+                                              start of spell (year)
+y6_ylhcs_endd~m byte    %32.0g     y6_ylhcs_enddatm
+                                              end of spell (month)
+y6_ylhcs_endd~y int     %32.0g     y6_ylhcs_enddaty
+                                              end of spell (year)
+y6_ylhcs_ongo~g byte    %32.0g     y6_ylhcs_ongoing
+                                              spell is still ongoing
+y6_ylhcs_corr~n byte    %74.0g     y6_ylhcs_correction
+                                              correction in check module
+y6_ylhcs_tp     byte    %32.0g     y6_ylhcs_tp
+                                              technical problem in longitudinal section
+y6_s1_sit2a     byte    %129.0g    y6_s1_sit2a
+                                              1s1: which school-type did or do you attend
+y6_s1_sit2aop   str36   %36s                  1s1: which school-type did or do you attend, other general education school
+y6_s1_sit2aopRV str72   %72s                  1s1: which school-type, other general education school (reduced version)
+y6_s1_sit2a_add str36   %36s                  1s1: which school-type did or do you attend, additional information
+y6_s1_checkbdat byte    %38.0g     y6_s1_checkbdat
+                                              2s1: january 2011: did i record that correctly
+y6_s1_grad3     byte    %32.0g     y6_s1_grad3
+                                              3s1: did you complete this general education school with an educational degree
+y6_s1_g_fed_ge  byte    %32.0g     y6_s1_g_fed_ge
+                                              4s1: in which federal state did you get this educational degree
+y6_s1_g_educ5   byte    %52.0g     y6_s1_g_educ5
+                                              5s1: in which country did you get this educational degree
+y6_s1_g_educ5RV byte    %32.0g     y6_s1_g_educ5RV
+                                              5s1: in which country did you get this educational degree (reduced version)
+y6_s1_g_educ2   byte    %62.0g     y6_s1_g_educ2
+                                              6s1: which educational degree was this
+y6_s1_g_educ2op str36   %36s                  6s1: which educational degree was this, other educational degree
+y6_s1_g_educ2~d str36   %36s                  6s1: which educational degree was this, additional information
+y6_s1_g_ggrad~G byte    %32.0g     y6_s1_g_ggradeoG
+                                              7s1: grades in school leaving certificate: overall (generated)
+y6_s1_g_ggradeo double  %32.0g     y6_s1_g_ggradeo
+                                              7s1: grades in school leaving certificate: overall, grade
+y6_s1_g_gcred~o float   %32.0g     y6_s1_g_gcredito
+                                              7s1: grades in school leaving certificate: overall, credit points
+y6_s1_proc1     byte    %32.0g     y6_s1_proc1
+                                              8s1: another general education school since january 2011
+y6_s1_proc2     byte    %32.0g     y6_s1_proc2
+                                              9s1: open calendar
+y6_s1_proc3     byte    %32.0g     y6_s1_proc3
+                                              10s1: is any information missing
+y6_s2_sit2b     byte    %72.0g     y6_s2_sit2b
+                                              1s2: which school-type did or do you attend
+y6_s2_sit2bop1  str36   %36s                  1s2: which school-type did or do you attend, other evening school
+y6_s2_sit2b~1RV str67   %67s                  1s2: which school-type, other evening school (reduced version)
+y6_s2_sit2bop2  str36   %36s                  1s2: which school-type did or do you attend, other general education school
+y6_s2_sit2b~2RV str65   %65s                  1s2: which school-type, other general education school (reduced version)
+y6_s2_grad3     byte    %32.0g     y6_s2_grad3
+                                              2s2: did you complete this school with an educational degree
+y6_s2_g_fed_ge  byte    %32.0g     y6_s2_g_fed_ge
+                                              3s2: in which federal state did you get this educational degree
+y6_s2_g_educ5   byte    %52.0g     y6_s2_g_educ5
+                                              4s2: in which country did you get this educational degree
+y6_s2_g_educ5RV byte    %32.0g     y6_s2_g_educ5RV
+                                              4s2: in which country did you get this educational degree (reduced version)
+y6_s2_g_educ2   byte    %62.0g     y6_s2_g_educ2
+                                              5s2: which educational degree was this
+y6_s2_g_educ2op str36   %36s                  5s2: which educational degree was this, other educational degree
+y6_s2_g_educ2~d str36   %36s                  5s2: which educational degree was this, additional information
+y6_s2_g_ggrad~G byte    %32.0g     y6_s2_g_ggradeoG
+                                              6s2: grades in school leaving certificate: overall, grade (generated)
+y6_s2_g_ggradeo double  %32.0g     y6_s2_g_ggradeo
+                                              6s2: grades in school leaving certificate: overall, grade
+y6_s2_g_gcred~o byte    %32.0g     y6_s2_g_gcredito
+                                              6s2: grades in school leaving certificate: overall, credit points
+y6_s2_proc1     byte    %32.0g     y6_s2_proc1
+                                              7s2: another second chance education since january 2011
+y6_s2_proc2     byte    %32.0g     y6_s2_proc2
+                                              8s2: open calendar
+y6_s2_proc3     byte    %32.0g     y6_s2_proc3
+                                              9s2: is any information missing
+y6_s3_isco08    byte    %32.0g     y6_s3_isco08
+                                              1s3: in which profession did or do you do your apprenticeship
+y6_s3_isco08RV  int     %32.0g     y6_s3_isco08RV
+                                              1s3: in which profession did or do you do your apprenticeship (reduced version)
+y6_s3_iseiG     float   %32.0g     y6_s3_iseiG
+                                              1s3: in which profession did or do you do your apprenticeship, isei (generated)
+y6_s3_siopsG    float   %32.0g     y6_s3_siopsG
+                                              1s3: in which profession did or do you do your apprenticeship, siops (generated)
+y6_s3_grad3     byte    %32.0g     y6_s3_grad3
+                                              2s3: did you complete this vocational training
+y6_s3_g_isco08  byte    %32.0g     y6_s3_g_isco08
+                                              3s3: what is the exact title of your vocational qualification
+y6_s3_g_isco0~V int     %32.0g     y6_s3_g_isco08RV
+                                              3s3: what is the exact title of your vocational qualification (reduced version)
+y6_s3_g_iseiG   float   %32.0g     y6_s3_g_iseiG
+                                              3s3: what is the exact title of your vocational qualification, isei (generated)
+y6_s3_g_siopsG  float   %32.0g     y6_s3_g_siopsG
+                                              3s3: what is the exact title of your vocational qualification, siops (generated)
+y6_s3_g_ggrad~G byte    %32.0g     y6_s3_g_ggradeoG
+                                              4s3: overall grade you got in vocational qualification certificate (generated)
+y6_s3_g_ggradeo double  %32.0g     y6_s3_g_ggradeo
+                                              4s3: overall grade you got in vocational qualification certificate, grade
+y6_s3_g_gcred~o byte    %32.0g     y6_s3_g_gcredito
+                                              4s3: overall grade you got in vocational qualification certificate, credit point
+y6_s3_g_educ1   byte    %32.0g     y6_s3_g_educ1
+                                              5s3: receive an additional educational degree with your vocational qualification
+y6_s3_gs_fed_ge byte    %32.0g     y6_s3_gs_fed_ge
+                                              6s3: in which federal state did you receive this degree
+y6_s3_gs_educ5  byte    %52.0g     y6_s3_gs_educ5
+                                              7s3: in which country did you receive this degree
+y6_s3_gs_educ~V byte    %32.0g     y6_s3_gs_educ5RV
+                                              7s3: in which country did you receive this degree (reduced version)
+y6_s3_gs_educ2  byte    %62.0g     y6_s3_gs_educ2
+                                              8s3: which educational degree was this
+y6_s3_gs_educ~p str36   %36s                  8s3: which educational degree was this, other educational degree
+y6_s3_gs_educ~d str36   %36s                  8s3: which educational degree was this, additional information
+y6_s3_gs_ggra~G byte    %32.0g     y6_s3_gs_ggradeoG
+                                              9s3: grades in school leaving certificate: overall (generated)
+y6_s3_gs_ggra~o double  %32.0g     y6_s3_gs_ggradeo
+                                              9s3: grades in school leaving certificate: overall, grade
+y6_s3_gs_gcre~o byte    %32.0g     y6_s3_gs_gcredito
+                                              9s3: grades in school leaving certificate: overall, credit points
+y6_s3_proc1     byte    %32.0g     y6_s3_proc1
+                                              10s3: another apprenticeship since january 2011
+y6_s3_proc2     byte    %32.0g     y6_s3_proc2
+                                              11s3: open calendar
+y6_s3_proc3     byte    %32.0g     y6_s3_proc3
+                                              12s3: is any information missing
+y6_s4_isco08    byte    %32.0g     y6_s4_isco08
+                                              1s4: in which profession did or do you do your apprenticeship
+y6_s4_isco08RV  int     %32.0g     y6_s4_isco08RV
+                                              1s4: in which profession did or do you do your apprenticeship (reduced version)
+y6_s4_iseiG     float   %32.0g     y6_s4_iseiG
+                                              1s4: in which profession did or do you do your apprenticeship, isei (generated)
+y6_s4_siopsG    float   %32.0g     y6_s4_siopsG
+                                              1s4: in which profession did or do you do your apprenticeship, siops (generated)
+y6_s4_grad3     byte    %32.0g     y6_s4_grad3
+                                              2s4: did you complete this vocational training
+y6_s4_g_isco08  byte    %32.0g     y6_s4_g_isco08
+                                              3s4: what is the exact title of your vocational qualification
+y6_s4_g_isco0~V int     %32.0g     y6_s4_g_isco08RV
+                                              3s4: what is the exact title of your vocational qualification (reduced version)
+y6_s4_g_iseiG   float   %32.0g     y6_s4_g_iseiG
+                                              3s4: what is the exact title of your vocational qualification, isei (generated)
+y6_s4_g_siopsG  float   %32.0g     y6_s4_g_siopsG
+                                              3s4: what is the exact title of your vocational qualification, siops (generated)
+y6_s4_g_ggrad~G byte    %32.0g     y6_s4_g_ggradeoG
+                                              4s4: overall grade you got in vocational qualification certificate (generated)
+y6_s4_g_ggradeo double  %32.0g     y6_s4_g_ggradeo
+                                              4s4: overall grade you got in vocational qualification certificate, grade
+y6_s4_g_gcred~o byte    %32.0g     y6_s4_g_gcredito
+                                              4s4: overall grade you got in vocational qualification certificate, credit point
+y6_s4_g_educ1   byte    %32.0g     y6_s4_g_educ1
+                                              5s4: receive an additional educational degree with your vocational qualification
+y6_s4_gs_fed_ge byte    %32.0g     y6_s4_gs_fed_ge
+                                              6s4: in which federal state did you receive this degree
+y6_s4_gs_educ5  byte    %52.0g     y6_s4_gs_educ5
+                                              7s4: in which country did you receive this degree
+y6_s4_gs_educ~V byte    %32.0g     y6_s4_gs_educ5RV
+                                              7s4: in which country did you receive this degree (reduced version)
+y6_s4_gs_educ2  byte    %62.0g     y6_s4_gs_educ2
+                                              8s4: which educational degree was this
+y6_s4_gs_educ~p str36   %36s                  8s4: which educational degree was this, other educational degree
+y6_s4_gs_educ~d str36   %36s                  8s4: which educational degree was this, additional information
+y6_s4_gs_ggra~G byte    %32.0g     y6_s4_gs_ggradeoG
+                                              9s4: grades in school leaving certificate: overall (generated)
+y6_s4_gs_ggra~o double  %32.0g     y6_s4_gs_ggradeo
+                                              9s4: grades in school leaving certificate: overall, grade
+y6_s4_gs_gcre~o byte    %32.0g     y6_s4_gs_gcredito
+                                              9s4: grades in school leaving certificate: overall, credit points
+y6_s4_proc1     byte    %32.0g     y6_s4_proc1
+                                              10s4: another school-based vocational education since january 2011
+y6_s4_proc2     byte    %32.0g     y6_s4_proc2
+                                              11s4: open calendar
+y6_s4_proc3     byte    %32.0g     y6_s4_proc3
+                                              12s4: is any information missing
+y6_s5_sit2c     byte    %39.0g     y6_s5_sit2c
+                                              1s5: which professional school did or do you attend
+y6_s5_sit2cop   str36   %36s                  1s5: which professional school did or do you attend, other school
+y6_s5_sit2copRV str72   %72s                  1s5: which professional school, other school (reduced version)
+y6_s5_grad3     byte    %32.0g     y6_s5_grad3
+                                              2s5: did you complete this continuing vocational education
+y6_s5_g_gradG   byte    %32.0g     y6_s5_g_gradG
+                                              3s5: what is the exact title of further voc. qualification (generated)
+y6_s5_g_isco08  byte    %32.0g     y6_s5_g_isco08
+                                              3s5: what is the exact title of further voc. qualification
+y6_s5_g_isco0~V int     %32.0g     y6_s5_g_isco08RV
+                                              3s5: what is the exact title of further voc. qualification (reduced version)
+y6_s5_g_iseiG   float   %32.0g     y6_s5_g_iseiG
+                                              3s5: what is the exact title of further voc. qualification, isei (generated)
+y6_s5_g_siopsG  float   %32.0g     y6_s5_g_siopsG
+                                              3s5: what is the exact title of further voc. qualification, siops (generated)
+y6_s5_g_educ2   byte    %62.0g     y6_s5_g_educ2
+                                              3s5: exact title of further vocational qualification, general education degree
+y6_s5_g_educ2op str36   %36s                  3s5: exact title of further vocational qualification, other qualification
+y6_s5_g_educ2~d str36   %36s                  3s5: exact title of further vocational qualification, additional information
+y6_s5_g_ggrad~G byte    %32.0g     y6_s5_g_ggradeoG
+                                              4s5: grades in school leaving certificate: overall (generated)
+y6_s5_g_ggradeo double  %32.0g     y6_s5_g_ggradeo
+                                              4s5: grades in school leaving certificate: overall, grade
+y6_s5_g_gcred~o byte    %32.0g     y6_s5_g_gcredito
+                                              4s5: grades in school leaving certificate: overall, credit points
+y6_s5_proc1     byte    %32.0g     y6_s5_proc1
+                                              5s5: another school for further education and training since january 2011
+y6_s5_proc2     byte    %32.0g     y6_s5_proc2
+                                              6s5: open calendar
+y6_s5_proc3     byte    %32.0g     y6_s5_proc3
+                                              7s5: is any information missing
+y6_s6_grad3     byte    %32.0g     y6_s6_grad3
+                                              1s6: did you complete this vocational re-training
+y6_s6_g_isco08  byte    %32.0g     y6_s6_g_isco08
+                                              2s6: what is the exact title of your qualification
+y6_s6_g_isco0~V int     %32.0g     y6_s6_g_isco08RV
+                                              2s6: what is the exact title of your qualification (reduced version)
+y6_s6_g_iseiG   float   %32.0g     y6_s6_g_iseiG
+                                              2s6: what is the exact title of your qualification, isei (generated)
+y6_s6_g_siopsG  byte    %32.0g     y6_s6_g_siopsG
+                                              2s6: what is the exact title of your qualification, siops (generated)
+y6_s6_g_ggrad~G byte    %32.0g     y6_s6_g_ggradeoG
+                                              3s6: grades in re-training certificate: overall (generated)
+y6_s6_g_ggradeo double  %32.0g     y6_s6_g_ggradeo
+                                              3s6: grades in re-training certificate: overall, grade
+y6_s6_g_gcred~o byte    %32.0g     y6_s6_g_gcredito
+                                              3s6: grades in re-training certificate: overall, credit points
+y6_s6_educ1     byte    %32.0g     y6_s6_educ1
+                                              4s6: receive an additional educational degree with your re-training
+y6_s6_gs_fed_ge byte    %32.0g     y6_s6_gs_fed_ge
+                                              5s6: in which federal state did you receive this degree
+y6_s6_gs_educ5  byte    %52.0g     y6_s6_gs_educ5
+                                              6s6: in which country did you receive this degree
+y6_s6_gs_educ~V byte    %32.0g     y6_s6_gs_educ5RV
+                                              6s6: in which country did you receive this degree (reduced version)
+y6_s6_gs_educ2  byte    %62.0g     y6_s6_gs_educ2
+                                              7s6: which educational degree was this
+y6_s6_gs_educ~p str36   %36s                  7s6: which educational degree was this, other educational degree
+y6_s6_gs_ggra~G byte    %32.0g     y6_s6_gs_ggradeoG
+                                              8s6: grades in school leaving certificate: overall (generated)
+y6_s6_gs_ggra~o double  %32.0g     y6_s6_gs_ggradeo
+                                              8s6: grades in school leaving certificate: overall, grade
+y6_s6_gs_gcre~o byte    %32.0g     y6_s6_gs_gcredito
+                                              8s6: grades in school leaving certificate: overall, credit points
+y6_s6_proc1     byte    %32.0g     y6_s6_proc1
+                                              9s6: another re-training since january 2011
+y6_s6_proc2     byte    %32.0g     y6_s6_proc2
+                                              10s6: open calendar
+y6_s6_proc3     byte    %32.0g     y6_s6_proc3
+                                              11s6: is any information missing
+y6_s7_masubj1~g byte    %75.0g     y6_s7_masubj1_sg
+                                              1s7: which subject did or do you study, major subject 1, subject group
+y6_s7_masu~1_as byte    %69.0g     y6_s7_masubj1_as
+                                              1s7: which subject did or do you study, major subject 1, area of studies
+y6_s7_masubj1_s int     %72.0g     y6_s7_masubj1_s
+                                              1s7: which subject did or do you study, major subject 1, subject
+y6_s7_masubj2~g byte    %75.0g     y6_s7_masubj2_sg
+                                              1s7: which subject did or do you study, major subject 2, subject group
+y6_s7_masu~2_as byte    %69.0g     y6_s7_masubj2_as
+                                              1s7: which subject did or do you study, major subject 2, area of studies
+y6_s7_masubj2_s int     %72.0g     y6_s7_masubj2_s
+                                              1s7: which subject did or do you study, major subject 2, subject
+y6_s7_masubj3~g byte    %75.0g     y6_s7_masubj3_sg
+                                              1s7: which subject did or do you study, major subject 3, subject group
+y6_s7_masu~3_as byte    %69.0g     y6_s7_masubj3_as
+                                              1s7: which subject did or do you study, major subject 3, area of studies
+y6_s7_masubj3_s int     %72.0g     y6_s7_masubj3_s
+                                              1s7: which subject did or do you study, major subject 3, subject
+y6_s7_masubj4~g byte    %75.0g     y6_s7_masubj4_sg
+                                              1s7: which subject did or do you study, major subject 4, subject group
+y6_s7_masu~4_as byte    %69.0g     y6_s7_masubj4_as
+                                              1s7: which subject did or do you study, major subject 4, area of studies
+y6_s7_masubj4_s byte    %72.0g     y6_s7_masubj4_s
+                                              1s7: which subject did or do you study, major subject 4, subject
+y6_s7_type      byte    %54.0g     y6_s7_type
+                                              2s7: which institution of higher education did or do you attend
+y6_s7_typeop    str36   %36s                  2s7: which institution of higher education, other institution
+y6_s7_typeopRV  str67   %67s                  2s7: which institution of higher education, other institution (reduced version)
+y6_s7_type_add  str36   %36s                  2s7: which institution of higher education, additional information
+y6_s7_name      str36   %36s                  3s7: what was or is the exact name of this institution of higher education
+y6_s7_city      str36   %36s                  4s7: in which city did or do you study this subject
+y6_s7_rest      byte    %32.0g     y6_s7_rest
+                                              5s7: selection test or specific gpa for admission to study subject
+y6_s7_grad3     byte    %32.0g     y6_s7_grad3
+                                              6s7: did you earn a university degree in this subject
+y6_s7_g_degree  byte    %52.0g     y6_s7_g_degree
+                                              7s7: which university degree did you earn
+y6_s7_g_degre~p str36   %36s                  7s7: which university degree did you earn, other degree
+y6_s7_g_ggrad~G byte    %32.0g     y6_s7_g_ggradeoG
+                                              8s7: grades in examination certificate: overall (generated)
+y6_s7_g_ggradeo double  %32.0g     y6_s7_g_ggradeo
+                                              8s7: grades in examination certificate: overall, grade
+y6_s7_g_gcred~o byte    %32.0g     y6_s7_g_gcredito
+                                              8s7: grades in examination certificate: overall, credit points
+y6_s7_degree    byte    %52.0g     y6_s7_degree
+                                              9s7: which degree will you receive with your current studies
+y6_s7_degreeop  str36   %36s                  9s7: which degree will you receive with your current studies, other degree
+y6_s7_degree_~d str36   %36s                  9s7: which degree will you receive with current studies, additional information
+y6_s7_proc1     byte    %32.0g     y6_s7_proc1
+                                              10s7: another subject since january 2011
+y6_s7_proc2     byte    %32.0g     y6_s7_proc2
+                                              11s7: open calendar
+y6_s7_proc3     byte    %32.0g     y6_s7_proc3
+                                              12s7: is any information missing
+y6_s8_educ1     byte    %32.0g     y6_s8_educ1
+                                              1s8: receive an educational degree in the course of your vocational preparation
+y6_s8_gs_fed_ge byte    %32.0g     y6_s8_gs_fed_ge
+                                              2s8: in which federal state did you receive this degree
+y6_s8_gs_educ5  byte    %52.0g     y6_s8_gs_educ5
+                                              3s8: in which country did you receive this degree
+y6_s8_gs_educ~V byte    %32.0g     y6_s8_gs_educ5RV
+                                              3s8: in which country did you receive this degree (reduced version)
+y6_s8_gs_educ2  byte    %62.0g     y6_s8_gs_educ2
+                                              4s8: which educational degree was this
+y6_s8_gs_educ~p str36   %36s                  4s8: which educational degree was this, other educational degree
+y6_s8_gs_educ~d str36   %36s                  4s8: which educational degree was this, additional information
+y6_s8_gs_ggra~G byte    %32.0g     y6_s8_gs_ggradeoG
+                                              5s8: grades in school leaving certificate: overall (generated)
+y6_s8_gs_ggra~o double  %32.0g     y6_s8_gs_ggradeo
+                                              5s8: grades in school leaving certificate: overall, grade
+y6_s8_gs_gcre~o float   %32.0g     y6_s8_gs_gcredito
+                                              5s8: grades in school leaving certificate: overall, credit points
+y6_s8_prepG     byte    %32.0g     y6_s8_prepG
+                                              6s8: for which profession did voc. prep. measure prepare you (generated)
+y6_s8_isco08    byte    %32.0g     y6_s8_isco08
+                                              6s8: for which profession did voc. prep. measure prepare you
+y6_s8_isco08RV  int     %32.0g     y6_s8_isco08RV
+                                              6s8: for which profession did voc. prep. measure prepare you (reduced version)
+y6_s8_iseiG     float   %32.0g     y6_s8_iseiG
+                                              6s8: for which profession did voc. prep. measure prepare you, isei (generated)
+y6_s8_siopsG    float   %32.0g     y6_s8_siopsG
+                                              6s8: for which profession did voc. prep. measure prepare you, siops (generated)
+y6_s8_proc1     byte    %32.0g     y6_s8_proc1
+                                              7s8: another vocational preparation measure since january 2011
+y6_s8_proc2     byte    %32.0g     y6_s8_proc2
+                                              8s8: open calendar
+y6_s8_proc3     byte    %32.0g     y6_s8_proc3
+                                              9s8: is any information missing
+y6_s9_tactG     byte    %32.0g     y6_s9_tactG
+                                              1s9: in which profession did or do you do your vocational training (generated)
+y6_s9_isco08    byte    %32.0g     y6_s9_isco08
+                                              1s9: in which profession did or do you do your vocational training
+y6_s9_isco08RV  int     %32.0g     y6_s9_isco08RV
+                                              1s9: in which profession did or do you do your voc. training (reduced version)
+y6_s9_iseiG     float   %32.0g     y6_s9_iseiG
+                                              1s9: in which profession did or do you do your voc. training, isei (generated)
+y6_s9_siopsG    float   %32.0g     y6_s9_siopsG
+                                              1s9: in which profession did or do you do your voc. training, siops (generated)
+y6_s9_tactop    str36   %36s                  1s9: in which profession did or do you do your voc. training, other activity
+y6_s9_tactopRV  str72   %72s                  1s9: profession of vocational training, other activity (reduced version)
+y6_s9_proc1     byte    %32.0g     y6_s9_proc1
+                                              2s9: another vocational training since january 2011
+y6_s9_proc2     byte    %32.0g     y6_s9_proc2
+                                              3s9: open calendar
+y6_s9_proc3     byte    %32.0g     y6_s9_proc3
+                                              4s9: is any information missing
+y6_s10_isco08   byte    %32.0g     y6_s10_isco08
+                                              1s10: what is your profession called
+y6_s10_isco08RV int     %32.0g     y6_s10_isco08RV
+                                              1s10: what is your profession called (reduced version)
+y6_s10_iseiG    float   %32.0g     y6_s10_iseiG
+                                              1s10: what is your profession called, isei (generated)
+y6_s10_siopsG   float   %32.0g     y6_s10_siopsG
+                                              1s10: what is your profession called, siops (generated)
+y6_s10_cont5    byte    %36.0g     y6_s10_cont5
+                                              2s10: type of contract at the beginning for this profession or job
+y6_s10_cont6    byte    %32.0g     y6_s10_cont6
+                                              3s10: was contract changed from a temporary contract to a permanent contract
+y6_s10_workh    byte    %37.0g     y6_s10_workh
+                                              4s10: weekly working hours in contract at beginning of job
+y6_s10_workhRV  float   %37.0g     y6_s10_workhRV
+                                              4s10: weekly working hours in contract at beginning of job (reduced version)
+y6_s10_proc1a   byte    %32.0g     y6_s10_proc1a
+                                              5s10: another full-time employment in same occupation since january 2011
+y6_s10_proc1b   byte    %32.0g     y6_s10_proc1b
+                                              6s10: another full-time employment in different occupation since january 2011
+y6_s10_proc2    byte    %32.0g     y6_s10_proc2
+                                              7s10: open calendar
+y6_s10_proc3    byte    %32.0g     y6_s10_proc3
+                                              8s10: is any information missing
+y6_s11_isco08   byte    %32.0g     y6_s11_isco08
+                                              1s11: what is your profession called
+y6_s11_isco08RV int     %32.0g     y6_s11_isco08RV
+                                              1s11: what is your profession called (reduced version)
+y6_s11_iseiG    float   %32.0g     y6_s11_iseiG
+                                              1s11: what is your profession called, isei (generated)
+y6_s11_siopsG   float   %32.0g     y6_s11_siopsG
+                                              1s11: what is your profession called, siops (generated)
+y6_s11_proc1a   byte    %32.0g     y6_s11_proc1a
+                                              2s11: another employment as contr. family worker in same occ. since january 2011
+y6_s11_proc1b   byte    %32.0g     y6_s11_proc1b
+                                              3s11: another employment as family worker in different occ. since january 2011
+y6_s11_proc2    byte    %32.0g     y6_s11_proc2
+                                              4s11: open calendar
+y6_s11_proc3    byte    %32.0g     y6_s11_proc3
+                                              5s11: is any information missing
+y6_s12_isco08   byte    %32.0g     y6_s12_isco08
+                                              1s12: what is your profession called
+y6_s12_isco08RV int     %32.0g     y6_s12_isco08RV
+                                              1s12: what is your profession called (reduced version)
+y6_s12_iseiG    float   %32.0g     y6_s12_iseiG
+                                              1s12: what is your profession called, isei (generated)
+y6_s12_siopsG   float   %32.0g     y6_s12_siopsG
+                                              1s12: what is your profession called, siops (generated)
+y6_s12_proc1a   byte    %32.0g     y6_s12_proc1a
+                                              2s12: another self-employment in same occupation since january 2011
+y6_s12_proc1b   byte    %32.0g     y6_s12_proc1b
+                                              3s12: another self-employment in different occupation since january 2011
+y6_s12_proc2    byte    %32.0g     y6_s12_proc2
+                                              4s12: open calendar
+y6_s12_proc3    byte    %32.0g     y6_s12_proc3
+                                              5s12: is any information missing
+y6_s13_isco08   byte    %32.0g     y6_s13_isco08
+                                              1s13: what is your profession called
+y6_s13_isco08RV int     %32.0g     y6_s13_isco08RV
+                                              1s13: what is your profession called (reduced version)
+y6_s13_iseiG    float   %32.0g     y6_s13_iseiG
+                                              1s13: what is your profession called, isei (generated)
+y6_s13_siopsG   float   %32.0g     y6_s13_siopsG
+                                              1s13: what is your profession called, siops (generated)
+y6_s13_cont5    byte    %36.0g     y6_s13_cont5
+                                              2s13: type of contract at the beginning for this profession or job
+y6_s13_cont6    byte    %32.0g     y6_s13_cont6
+                                              3s13: was contract changed from a temporary contract to a permanent contract
+y6_s13_workh    byte    %37.0g     y6_s13_workh
+                                              4s13: weekly working hours in contract at beginning of job
+y6_s13_workhRV  float   %37.0g     y6_s13_workhRV
+                                              4s13: weekly working hours in contract at beginning of job (reduced version)
+y6_s13_proc1a   byte    %32.0g     y6_s13_proc1a
+                                              5s13: another part-time employment in same occupation since january 2011
+y6_s13_proc1b   byte    %32.0g     y6_s13_proc1b
+                                              6s13: another part-time employment in different occupation since january 2011
+y6_s13_proc2    byte    %32.0g     y6_s13_proc2
+                                              7s13: open calendar
+y6_s13_proc3    byte    %32.0g     y6_s13_proc3
+                                              8s13: is any information missing
+y6_s14_tact     byte    %62.0g     y6_s14_tact
+                                              1s14: what did you do exactly
+y6_s14_tactop   str36   %36s                  1s14: what did you do exactly, something else
+y6_s14_tactopRV str35   %35s                  1s14: what did you do exactly, something else (reduced version)
+y6_s14_isco08   byte    %32.0g     y6_s14_isco08
+                                              2s14: for which profession did or does this activity prepare
+y6_s14_isco08RV int     %32.0g     y6_s14_isco08RV
+                                              2s14: for which profession did or does this activity prepare (reduced version)
+y6_s14_iseiG    float   %32.0g     y6_s14_iseiG
+                                              2s14: for which profession did or does this activity prepare, isei (generated)
+y6_s14_siopsG   float   %32.0g     y6_s14_siopsG
+                                              2s14: for which profession did or does this activity prepare, siops (generated)
+y6_s14_paid     byte    %32.0g     y6_s14_paid
+                                              3s14: was this activity paid or unpaid or was there expense allowance
+y6_s14_proc1    byte    %32.0g     y6_s14_proc1
+                                              4s14: another internship since january 2011
+y6_s14_proc2    byte    %32.0g     y6_s14_proc2
+                                              5s14: open calendar
+y6_s14_proc3    byte    %32.0g     y6_s14_proc3
+                                              6s14: is any information missing
+y6_s15_proc1    byte    %32.0g     y6_s15_proc1
+                                              1s15: another secondary employment since january 2011
+y6_s15_proc2    byte    %32.0g     y6_s15_proc2
+                                              2s15: open calendar
+y6_s15_proc3    byte    %32.0g     y6_s15_proc3
+                                              3s15: is any information missing
+y6_s16_proc1    byte    %32.0g     y6_s16_proc1
+                                              1s16: another maternity leave or parental leave since january 2011
+y6_s16_proc2    byte    %32.0g     y6_s16_proc2
+                                              2s16: open calendar
+y6_s16_proc3    byte    %32.0g     y6_s16_proc3
+                                              3s16: is any information missing
+y6_s17_proc1    byte    %32.0g     y6_s17_proc1
+                                              1s17: another volontary or military service since january 2011
+y6_s17_proc2    byte    %32.0g     y6_s17_proc2
+                                              2s17: open calendar
+y6_s17_proc3    byte    %32.0g     y6_s17_proc3
+                                              3s17: is any information missing
+y6_s18_proc1    byte    %32.0g     y6_s18_proc1
+                                              1s18: another work & travel programme or stay abroad since january 2011
+y6_s18_proc2    byte    %32.0g     y6_s18_proc2
+                                              2s18: open calendar
+y6_s18_proc3    byte    %32.0g     y6_s18_proc3
+                                              3s18: is any information missing
+y6_s19_proc1    byte    %32.0g     y6_s19_proc1
+                                              1s19: another period of unemployment or job-seeking since january 2011
+y6_s19_proc2    byte    %32.0g     y6_s19_proc2
+                                              2s19: open calendar
+y6_s19_proc3    byte    %32.0g     y6_s19_proc3
+                                              3s19: is any information missing
+y6_s20_proc1    byte    %32.0g     y6_s20_proc1
+                                              1s20: another period as househusband or housewife since january 2011
+y6_s20_proc2    byte    %32.0g     y6_s20_proc2
+                                              2s20: open calendar
+y6_s20_proc3    byte    %32.0g     y6_s20_proc3
+                                              3s20: is any information missing
+y6_s21_proc1    byte    %32.0g     y6_s21_proc1
+                                              1s21: another period of incapacity for work since january 2011
+y6_s21_proc2    byte    %32.0g     y6_s21_proc2
+                                              2s21: open calendar
+y6_s21_proc3    byte    %32.0g     y6_s21_proc3
+                                              3s21: is any information missing
+y6_s22_tactop   str36   %36s                  1s22: what did you do during this time
+y6_s22_tactopRV str55   %55s                  1s22: what did you do during this time (reduced version)
+y6_s22_proc1    byte    %32.0g     y6_s22_proc1
+                                              2s22: another activity since january 2011
+y6_s22_proc2    byte    %32.0g     y6_s22_proc2
+                                              3s22: open calendar
+y6_s22_proc3    byte    %32.0g     y6_s22_proc3
+                                              4s22: is any information missing
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Sorted by: youthid
+
+. 
+end of do-file
+
+. fre y6_s1_sit2aopRV
+
+y6_s1_sit2aopRV -- 1s1: which school-type, other general education school (reduced version)
+-------------------------------------------------------------------------------------------
+                                              |      Freq.    Percent      Valid       Cum.
+----------------------------------------------+--------------------------------------------
+Valid   -55 other missing                     |          2       0.01       0.01       0.01
+        -77 not applicable                    |      24614      98.42      98.42      98.43
+        ADULT EDUCATION COLLEGE (kolleg)      |          5       0.02       0.02      98.45
+        COMMERCIAL SCHOOL (handelsschule)     |          3       0.01       0.01      98.46
+        DISTANCE LEARNING SCHOOL (fernschule) |          2       0.01       0.01      98.47
+        EVENING INTERMEDIATE SECONDARY SCHOOL |          3       0.01       0.01      98.48
+        (abendrealschule)                     |                                            
+        EVENING SCHOOL (abendschule)          |          4       0.02       0.02      98.50
+        EVENING UPPER SECONDARY SCHOOL        |          2       0.01       0.01      98.51
+        (abendgymnasium)                      |                                            
+        FOLK HIGH SCHOOL (volkshochschule)    |          4       0.02       0.02      98.52
+        FULL-TIME VOCATIONAL SCHOOL           |         13       0.05       0.05      98.58
+        (berufsfachschule)                    |                                            
+        HIGHER COMMERCIAL SCHOOL (hoehere     |          7       0.03       0.03      98.60
+        handelsschule)                        |                                            
+        HIGHER EDUCATION INSTITUTION          |          1       0.00       0.00      98.61
+        HIGHER FULL-TIME VOCATIONAL SCHOOL    |          3       0.01       0.01      98.62
+        (hoehere berufsfachschule)            |                                            
+        HIGHER SECONDARY VOCATIONAL SCHOOL    |          2       0.01       0.01      98.63
+        (berufsoberschule)                    |                                            
+        HIGHER SECONDARY VOCATIONAL SCHOOL    |         38       0.15       0.15      98.78
+        (fachgymnasium/berufliches gymnasium) |                                            
+        INTERNSHIP/TRAINEESHIP                |          1       0.00       0.00      98.78
+        OTHER                                 |         10       0.04       0.04      98.82
+        OTHER EDUCATION                       |          3       0.01       0.01      98.84
+        OTHER GENERAL EDUCATION SCHOOL        |         73       0.29       0.29      99.13
+        OTHER SCHOOL                          |         28       0.11       0.11      99.24
+        OTHER VOCATIONAL SCHOOL               |         49       0.20       0.20      99.44
+        SCHOOL FOR CONTINUING VOCATIONAL      |          2       0.01       0.01      99.44
+        TRAINING (fachschule/fachakademie)    |                                            
+        STUDYING                              |          1       0.00       0.00      99.45
+        UNIVERSITY                            |          2       0.01       0.01      99.46
+        UNIVERSITY OF APPLIED SCIENCE         |          3       0.01       0.01      99.47
+        (fachhochschule)                      |                                            
+        VOCATIONAL COLLEGE (berufskolleg)     |         80       0.32       0.32      99.79
+        VOCATIONAL EXTENSION SCHOOL           |          3       0.01       0.01      99.80
+        (berufsaufbauschule)                  |                                            
+        VOCATIONAL PREPARATION MEASURE        |         20       0.08       0.08      99.88
+        VOCATIONAL SCHOOL (berufsschule)      |         27       0.11       0.11      99.99
+        VOCATIONAL TRAINING                   |          1       0.00       0.00      99.99
+        VOLUNTARY/MILITARY SERVICE            |          2       0.01       0.01     100.00
+        Total                                 |      25008     100.00     100.00           
+-------------------------------------------------------------------------------------------
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD8b38_000000.tmp"
+
+. 
+. br youthid *beg* *end* y6_s1
+y6_s1 ambiguous abbreviation
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD8b38_000000.tmp"
+
+. br youthid *beg* *end* y6_s1*
+
+.  
+. 
+end of do-file
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD8b38_000000.tmp"
+
+. br
+
+. 
+end of do-file
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD8b38_000000.tmp"
+
+. fre y6_ylhcs_spt1
+
+y6_ylhcs_spt1 -- spell type (first level)
+------------------------------------------------------------------------
+                           |      Freq.    Percent      Valid       Cum.
+---------------------------+--------------------------------------------
+Valid   1 education        |      12556      50.21      50.21      50.21
+        2 employment       |       6701      26.80      26.80      77.00
+        3 other activities |       5751      23.00      23.00     100.00
+        Total              |      25008     100.00     100.00           
+------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD8b38_000000.tmp"
+
+. fre y6_ylhcs_spt1
+
+y6_ylhcs_spt1 -- spell type (first level)
+------------------------------------------------------------------------
+                           |      Freq.    Percent      Valid       Cum.
+---------------------------+--------------------------------------------
+Valid   1 education        |      12556      50.21      50.21      50.21
+        2 employment       |       6701      26.80      26.80      77.00
+        3 other activities |       5751      23.00      23.00     100.00
+        Total              |      25008     100.00     100.00           
+------------------------------------------------------------------------
+
+. fre y6_ylhcs_spt2
+
+y6_ylhcs_spt2 -- spell type (second level)
+----------------------------------------------------------------------------------------------------
+                                                       |      Freq.    Percent      Valid       Cum.
+-------------------------------------------------------+--------------------------------------------
+Valid   1  general education                           |       6557      26.22      26.22      26.22
+        2  second chance education                     |        649       2.60       2.60      28.81
+        3  apprenticeship (in a company and in school) |       1840       7.36       7.36      36.17
+        4  school-based vocational education           |        573       2.29       2.29      38.46
+        5  school for further education and training   |         46       0.18       0.18      38.65
+        6  re-training                                 |          6       0.02       0.02      38.67
+        7  studying                                    |       1949       7.79       7.79      46.47
+        8  vocational preparation                      |        593       2.37       2.37      48.84
+        9  other vocational education                  |        343       1.37       1.37      50.21
+        10 full-time employment                        |       1403       5.61       5.61      55.82
+        11 contributing family worker                  |        166       0.66       0.66      56.48
+        12 self-employment                             |        103       0.41       0.41      56.89
+        13 part-time employment                        |        585       2.34       2.34      59.23
+        14 internship/traineeship/etc.                 |       1498       5.99       5.99      65.22
+        15 other secondary employment                  |       2946      11.78      11.78      77.00
+        16 maternity/parental leave                    |         87       0.35       0.35      77.35
+        17 voluntary/military service                  |        459       1.84       1.84      79.19
+        18 work & travel programme/stay abroad         |        358       1.43       1.43      80.62
+        19 unemployment/job-seeking                    |        801       3.20       3.20      83.82
+        20 housewife/househusband                      |         51       0.20       0.20      84.03
+        21 incapacity for work                         |         47       0.19       0.19      84.21
+        22 other activity                              |       3948      15.79      15.79     100.00
+        Total                                          |      25008     100.00     100.00           
+----------------------------------------------------------------------------------------------------
+
+. 
+end of do-file
+
+. br
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD8b38_000000.tmp"
+
+. unique(youthid)
+Number of unique values of youthid is  5074
+Number of records is  25008
+
+. 
+end of do-file
+
+. br
+
+. br
+
