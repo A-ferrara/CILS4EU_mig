@@ -26,12 +26,44 @@ use "$DATA/w6_ylhcs_ge_v6.0.0_rv.dta", clear
 describe
 
  
+ 
+ *use "$DATA/w6_ym_ge_v6.0.0_rv", clear
+ 
+**  add the year of birth from the other dataset 
+merge m:1 youthid using "$DATA/w6_ym_ge_v6.0.0_rv.dta" , keepusing (y6_doby) keep (match)
+ 
+ 
+ 
+ fre y6_doby   if y6_ylhcs_index==1  
+ 
+ gen age = y6_ylhcs_begdaty - y6_doby 
+ fre age  if y6_ylhcs_index==1  
+  
+  
+  
+ br if age == 22 & y6_ylhcs_index==1  
+ 
+ 
+ fre y6_sample
+ 
+ 
+ y6_s1_sit2a
+ 
+ 
+ 
+ 
+ 
 
 br youthid *beg* *end* y6_s1*
 br
 
 fre y6_ylhcs_spt1
 fre y6_ylhcs_spt2
+
+
+fre  y6_s1_sit2a if y6_ylhcs_index==1 
+
+
 
 
 unique(youthid)
