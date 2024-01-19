@@ -71,7 +71,7 @@ global GRAPH "$WORKDIR\05_tables"
 ************************************************************************
 
 *ssc install varlab 
-
+net install convertCMC, from(https://raw.githubusercontent.com/bugbunny/convertCMC/master)
 
 
 
