@@ -46,14 +46,20 @@ run ${censor_prog}/Censor_Programs.do /*defines the programs in the Censor_Progr
 use $MY_IN_PATH\\${spellfile}.dta, clear
  
 rename ${s_pid} ${p_pid}
+
+
 sort ${p_pid} ${begin} ${end} ${spelltype} 
+
 gen keep_spells = 0
 foreach val of global spells {
 	replace keep_spells = 1 if ${spelltype} == `val'
 }
 keep if keep_spells == 1
  
-censor_unfold ${censor}
+censor_unfold ${censor}   
+// what is this step doing exactly?
+
+
  
 * all endings of spells must be equal to the beginning of the following
 bysort ${p_pid} (${begin} ${end}): replace ${end} = ${end} + 1 if ${end} > 0 
@@ -79,7 +85,7 @@ save ${MY_TEMP_PATH}\spelldata.dta, replace
 use ${p_pid} ${year} ${month} ${variables_panel} using ${MY_IN_PATH}\\${panelfile}.dta, clear
 sort ${p_pid} ${year} 
  
-*under the assumption thatthe spell data is on monthly basis
+*under the assumption that the spell data is on monthly basis
 gen not_valid = 0
 replace not_valid = 1 if ${month} < 0
 lab var not_valid "Month of interview not valid"

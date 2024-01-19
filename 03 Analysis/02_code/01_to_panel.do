@@ -12,58 +12,132 @@ local date : di %dDNCY daily("$S_DATE", "DMY")
 di "`date'"
 
 
+* create log file 
 capture log close _all 
 log using "$LOG\log_01_to_panel_`date'.log", replace
 
 
+************************************************************************
+************* 1. Browse the datasets ***********************************
+************************************************************************
 
-* relationship information 
+* Dataset relationship information 
 use "$DATA/w6_ylhcp_ge_v6.0.0_rv.dta", clear
 describe
 
-* education and profession 
+* Dataset  with year of birth
+use "$DATA/w6_ym_ge_v6.0.0_rv.dta", clear
+
+
+* Dataset  education and profession 
 use "$DATA/w6_ylhcs_ge_v6.0.0_rv.dta", clear
 describe
 
- 
- 
- *use "$DATA/w6_ym_ge_v6.0.0_rv", clear
- 
-**  add the year of birth from the other dataset 
-merge m:1 youthid using "$DATA/w6_ym_ge_v6.0.0_rv.dta" , keepusing (y6_doby) keep (match)
- 
- 
- 
- fre y6_doby   if y6_ylhcs_index==1  
- 
- gen age = y6_ylhcs_begdaty - y6_doby 
- fre age  if y6_ylhcs_index==1  
   
-  
-  
- br if age == 22 & y6_ylhcs_index==1  
- 
- 
- fre y6_sample
- 
- 
- y6_s1_sit2a
- 
- 
- 
- 
- 
 
-br youthid *beg* *end* y6_s1*
-br
-
-fre y6_ylhcs_spt1
-fre y6_ylhcs_spt2
+ 
+ 
+************************************************************************
+************* 2. Preparation of dataset ********************************
+************************************************************************
+ 
+*  add year of birth from the other dataset 
+merge m:1 youthid using "$DATA/w6_ym_ge_v6.0.0_rv.dta" , keepusing (y6_doby y6_dobm  y6_sex) keep (match)
 
 
-fre  y6_s1_sit2a if y6_ylhcs_index==1 
+* Get months and year information of the interview separately 
+gen intdate = dofm(y6_intdat_ylhcsRV)
+format intdate %d
+gen intmonth=month(intdate)
+gen inty=year(intdate) 
+drop intdate
+
+* generate an age variable (broad)
+gen age = y6_ylhcs_begdaty - y6_doby 
+fre age  if y6_ylhcs_index==1  
+br if age == 22 & y6_ylhcs_index==1  
+fre y6_sample
+
+*clone some variables
+clonevar begm  = y6_ylhcs_begdatm
+clonevar begy  = y6_ylhcs_begdaty
 
 
+clonevar endm        = y6_ylhcs_enddatm
+clonevar endy        = y6_ylhcs_enddaty
+
+clonevar birthdm     = y6_dobm 
+clonevar birthdy     = y6_doby 
+
+clonevar index       = y6_ylhcs_index
+
+
+
+** if ongoing, take the date (month) of the interview as month (if month is missing)
+br *id y6_ylhcs_index  *m *y *ongoing *correction *tp if endm<0 | begm<0 
+
+
+
+//Q: in the variable y6_ylhcs_ongoing  it says sometimes "correction of end date" but I do not know whether they actually corrected the variable and where to find this information  
+
+* see e.g. this person 
+br *id y6_ylhcs_index  *m *y *ongoing *correction *tp if youthid== 20140217
+
+
+
+
+* missing/no answer/ don't know but still ongoing --> interviewmonth and interviewyear (kind of censoring)
+replace endm  = intmonth if y6_ylhcs_ongoing == 1 & y6_ylhcs_enddatm  < 0  |  y6_ylhcs_enddatm >12
+replace endy  = inty if y6_ylhcs_ongoing == 1 & y6_ylhcs_enddaty  < 0 
+
+
+
+
+tab  y6_ylhcs_enddatm y6_ylhcs_ongoing,m 
+tab  y6_ylhcs_enddaty y6_ylhcs_ongoing,m 
+
+
+* consider missings using 
+fre y6_ylhcs_ongoing 
+fre y6_ylhcs_tp
+fre y6_ylhcs_correction
+
+
+
+
+
+* replace unspecific information on the month for beginning and ending month set negative answers to missing
+global dates "begm endm  begy endy birthdm birthdy"
+
+foreach val of global dates {
+recode `val'  (21 = 2 ) (24 = 4 ) (27 = 7) (30 = 9) (32 = 11) (-99 -88 -55 -22 -44 = .)
+}
+
+
+
+** my idea here is that there are five categories/periods meaning the year is split up into 2,5 months per period so first January- mid March so I always took the month "in the middle" , in this case February (other suggestions are welcome)
+
+/*
+        21  beginning of year/winter  --> February
+        24  spring                    --> April
+        27  mid-year/summer           --> July
+        30  autumn                    --> September
+        32  end of year				  --> November
+*/ 
+
+
+* Change data to century month  //the e_m monthly date (months since 1960m1) corresponding to year Y, month M 
+
+
+* Beginning of a spell in cm 
+gen begincm = ym(begy, begm)
+ 
+ 
+* End of a spell in cm
+gen endcm = ym(endy, endm)
+
+* Year and month of birth in cm  (not sure if this is relevant but more specific than year of birth)
+gen birthcm = ym( birthdy, birthdm)
 
 
 unique(youthid)
@@ -74,8 +148,6 @@ Number of records is  25008
 */
 
 
-
- 
  * youthid --> id variable 
  *  y6_ylhcs_begdatm --> beginning of spell (month)
  * y6_ylhcs_begdaty --> beginning of spell (year)
@@ -86,19 +158,63 @@ Number of records is  25008
 * other important variables:
 * *_ongoing
 * *_correction 
+ 
+************************************************************************
+************* 3. Globals for spell file *******************************
+************************************************************************
+ 
+*global spellfile 		"artkalen"				/** Name of spell datafile **/
+
+global pid 			youthid					/** Identifier for individuals in spell datafile **/
+global spellnr 			index				/** Identifier for spells of each person **/
+global spelltype 		y6_ylhcs_spt2				/** spelltype of spells which will be used for splitting **/
+global spells 			"1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22"					/** Values of Spelltyp for which spells between interviews shall be identified (here for example the values for vocational training. You can choose as much spelltypes you want by putting the according values of the spelltype) **/
+
+global begin 			begincm 					/** Begin of spells **/
+global end 				endcm					/** End of spells **/
+*global censor 			zensor					/** Censor-Variable **/
 
 
-*************  Globals for spell file ****************************
+sort ${pid} ${begin} ${end} ${spelltype} 
+order ${pid} ${begin} ${end} ${spelltype} 
 
-global spellfile 		"artkalen"				/** Name of spell datafile **/
-
-global s_pid 			persnr					/** Identifier for individuals in spell datafile **/
-global spellnr 			spellnr					/** Identifier for spells of each person **/
-global spelltype 		spelltyp				/** spelltype of spells which will be used for splitting **/
-global spells 			"3 4"					/** Values of Spelltyp for which spells between interviews shall be identified (here for example the values for vocational training. You can choose as much spelltypes you want by putting the according values of the spelltype) **/
-
-global begin 			begin					/** Begin of spells **/
-global end 				end						/** End of spells **/
-global censor 			zensor					/** Censor-Variable **/
+************************************************************************
+************* 4.  Spell data preparation *******************************
+************************************************************************
 
 
+
+** of there are certain statuses you want to exclude (remove the value from global spells)
+gen keep_spells = 0
+foreach val of global spells {
+	replace keep_spells = 1 if ${spelltype} == `val'
+}
+
+br ${pid} ${begin} ${end} ${spelltype}  keep_spells 
+
+keep if keep_spells == 1
+ 
+
+br ${pid} ${begin} ${end} ${spelltype}  keep_spells 
+
+fre keep_spells
+
+
+* all endings of spells must be equal to the beginning of the following
+bysort ${pid} (${begin} ${end}): replace ${end} = ${end} + 1 if ${end} > 0 
+ // is this necessary for this dataset? double-check! 
+
+
+gen duration = ${end} - ${begin} 
+*if end or begin of a spell is unknown or missing, the duration of a spell is set as zero month and the spell will not be expanded
+replace duration = 0 if ${end} < 0 | ${begin} < 0
+expand duration
+bysort ${pid} ${spellnr} (${begin} ${end}): replace ${begin} = ${begin}[_n-1] + 1 if ${begin}[_n-1] != .
+ 
+replace ${end} = ${begin} + 1
+
+drop duration keep_spells
+order ${p_pid} ${begin} ${end} ${spellnr} ${spelltype}
+ 
+save "$TEMP\spelldata.dta", replace 
+ 

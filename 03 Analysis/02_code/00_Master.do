@@ -54,7 +54,7 @@ global WORKDIR "Z:Eigene Dateien\GitHub\CILS4EU_mig\03 Analysis"
 
 
 global DATA "Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data" 
-global TEMP "Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\01_data\TEMP"
+global TEMP "Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP"
 global DO "$WORKDIR\02_code"
 global LOG     "$WORKDIR\03_log" /* hier soll das log-file gespeichert werden */
 global DESC "$WORKDIR\04_graphs"
@@ -87,5 +87,5 @@ global GRAPH "$WORKDIR\05_tables"
 *-------------+---------------------------------------------------------
 
 
- *do "$DO/01_Mixed_generation.do"	
+ do "$DO/01_to_panel.do"	
 
