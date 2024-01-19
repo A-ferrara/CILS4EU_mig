@@ -26512,3 +26512,621 @@ end of do-file
 
 r(198);
 
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. use  "$TEMP\paneldata.dta", clear 
+(30 Jul 2021)
+
+. 
+. 
+. forvalues i = 1(1)17 {
+  2. merge 1:1 ${pid} ${begin}  using "$TEMP\spelldata_`i'.dta", keepusing (educ*) gen(mergepanel`i')
+  3. display `i'
+  4. }
+variable educ* not found
+    You specified the keep(varlist) option.  The above error was the result of parsing the list of variables you supplied against the using data.
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. use  "$TEMP\paneldata.dta", clear 
+(30 Jul 2021)
+
+. 
+. 
+. forvalues i = 1(1)17 {
+  2. merge 1:1 ${pid} ${begin}  using "$TEMP\spelldata_`i'.dta", keepusing (educ1 educ2 educ3 educ4 educ5 educ6 educ7 educ8 educ9 educ11 educ12 educ13 educ14 educ15 edu
+> c16 educ17 educ18 educ19 educ20 educ21 educ22
+  3. ) gen(mergepanel`i')
+  4. display `i'
+  5. }
+) required
+r(100);
+
+end of do-file
+
+r(100);
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. use  "$TEMP\paneldata.dta", clear 
+(30 Jul 2021)
+
+. 
+. 
+. forvalues i = 1(1)17 {
+  2. merge 1:1 ${pid} ${begin}  using "$TEMP\spelldata_`i'.dta", keepusing (educ1 educ2 educ3 educ4 educ5 educ6 educ7 educ8 educ9 educ11 educ12 educ13 educ14 educ15 edu
+> c16 educ17 educ18 educ19 educ20 educ21 educ22
+  3. ) gen(mergepanel`i')
+  4. display `i'
+  5. }
+) required
+r(100);
+
+end of do-file
+
+r(100);
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. 
+. use  "$TEMP\paneldata.dta", clear 
+(30 Jul 2021)
+
+. 
+. 
+. forvalues i = 1(1)17 {
+  2. merge 1:1 ${pid} ${begin}  using "$TEMP\spelldata_`i'.dta", keepusing (educ1 educ2 educ3 educ4 educ5 educ6 educ7 educ8 educ9 educ11 educ12 educ13 educ14 educ15 edu
+> c16 educ17 educ18 educ19 educ20 educ21 educ22) gen(mergepanel`i')
+  3. display `i'
+  4. }
+variable educ1 not found
+    You specified the keep(varlist) option.  The above error was the result of parsing the list of variables you supplied against the using data.
+r(111);
+
+end of do-file
+
+r(111);
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. use  "$TEMP\paneldata.dta", clear 
+(30 Jul 2021)
+
+. 
+end of do-file
+
+. br
+
+. help merge
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. 
+. use "$TEMP\spelldata.dta", clear  
+(30 Jul 2021)
+
+. 
+. **REMOVE??? 
+. * generate a variable for each possible value of ${spelltype}  (22 values)
+. forvalues i = 1(1)22 {
+  2. clonevar educ`i' =  ${spelltype}  if ${spelltype} ==`i'
+  3.  display `i'
+  4. }
+(219,711 missing values generated)
+1
+(610,333 missing values generated)
+2
+(581,739 missing values generated)
+3
+(612,268 missing values generated)
+4
+(623,095 missing values generated)
+5
+(623,720 missing values generated)
+6
+(592,871 missing values generated)
+7
+(617,246 missing values generated)
+8
+(618,904 missing values generated)
+9
+(608,645 missing values generated)
+10
+(619,219 missing values generated)
+11
+(621,646 missing values generated)
+12
+(617,841 missing values generated)
+13
+(616,435 missing values generated)
+14
+(580,901 missing values generated)
+15
+(622,635 missing values generated)
+16
+(619,010 missing values generated)
+17
+(621,181 missing values generated)
+18
+(616,990 missing values generated)
+19
+(622,442 missing values generated)
+20
+(623,278 missing values generated)
+21
+(609,060 missing values generated)
+22
+
+. 
+. 
+end of do-file
+
+. br
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. keep educ* 
+
+. 
+end of do-file
+
+. br
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. use "$TEMP\spelldata.dta", clear  
+(30 Jul 2021)
+
+. 
+end of do-file
+
+. br
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. use "$TEMP\spelldata.dta", clear  
+(30 Jul 2021)
+
+. 
+. **REMOVE??? 
+. * generate a variable for each possible value of ${spelltype}  (22 values)
+. forvalues i = 1(1)22 {
+  2. clonevar educ`i' =  ${spelltype}  if ${spelltype} ==`i'
+  3.  display `i'
+  4. }
+(219,711 missing values generated)
+1
+(610,333 missing values generated)
+2
+(581,739 missing values generated)
+3
+(612,268 missing values generated)
+4
+(623,095 missing values generated)
+5
+(623,720 missing values generated)
+6
+(592,871 missing values generated)
+7
+(617,246 missing values generated)
+8
+(618,904 missing values generated)
+9
+(608,645 missing values generated)
+10
+(619,219 missing values generated)
+11
+(621,646 missing values generated)
+12
+(617,841 missing values generated)
+13
+(616,435 missing values generated)
+14
+(580,901 missing values generated)
+15
+(622,635 missing values generated)
+16
+(619,010 missing values generated)
+17
+(621,181 missing values generated)
+18
+--Break--
+r(1);
+
+end of do-file
+
+--Break--
+r(1);
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. 
+. use "$TEMP\spelldata.dta", clear  
+(30 Jul 2021)
+
+. 
+. **REMOVE??? 
+. * generate a variable for each possible value of ${spelltype}  (22 values)
+. forvalues i = 1(1)22 {
+  2. clonevar educ`i' =  ${spelltype}  if ${spelltype} ==`i'
+  3.  display `i'
+  4. }
+(219,711 missing values generated)
+1
+(610,333 missing values generated)
+2
+(581,739 missing values generated)
+3
+(612,268 missing values generated)
+4
+(623,095 missing values generated)
+5
+(623,720 missing values generated)
+6
+(592,871 missing values generated)
+7
+(617,246 missing values generated)
+8
+(618,904 missing values generated)
+9
+(608,645 missing values generated)
+10
+(619,219 missing values generated)
+11
+(621,646 missing values generated)
+12
+(617,841 missing values generated)
+13
+(616,435 missing values generated)
+14
+(580,901 missing values generated)
+15
+(622,635 missing values generated)
+16
+(619,010 missing values generated)
+17
+(621,181 missing values generated)
+18
+(616,990 missing values generated)
+19
+(622,442 missing values generated)
+20
+(623,278 missing values generated)
+21
+(609,060 missing values generated)
+22
+
+. 
+. keep youthid begincm endcm index educ* 
+
+. 
+. forvalues i = 1(1)17 {
+  2.         use "$TEMP\spelldata.dta", clear  
+  3.         keep if index==`i'
+  4.         save "$TEMP\spelldata_`i'.dta", replace
+  5.  display `i'
+  6. }
+(30 Jul 2021)
+(262,763 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_1.dta saved
+1
+(30 Jul 2021)
+(514,026 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_2.dta saved
+2
+(30 Jul 2021)
+(558,483 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_3.dta saved
+3
+(30 Jul 2021)
+(583,330 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_4.dta saved
+4
+(30 Jul 2021)
+(600,320 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_5.dta saved
+5
+(30 Jul 2021)
+(612,558 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_6.dta saved
+6
+(30 Jul 2021)
+(617,629 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_7.dta saved
+7
+(30 Jul 2021)
+(620,518 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_8.dta saved
+8
+(30 Jul 2021)
+(622,297 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_9.dta saved
+9
+(30 Jul 2021)
+(622,840 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_10.dta saved
+10
+(30 Jul 2021)
+(623,350 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_11.dta saved
+11
+(30 Jul 2021)
+(623,531 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_12.dta saved
+12
+(30 Jul 2021)
+(623,676 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_13.dta saved
+13
+(30 Jul 2021)
+(623,729 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_14.dta saved
+14
+(30 Jul 2021)
+(623,744 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_15.dta saved
+15
+(30 Jul 2021)
+(623,758 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_16.dta saved
+16
+(30 Jul 2021)
+(623,768 observations deleted)
+file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_17.dta saved
+17
+
+. 
+. 
+end of do-file
+
+. br
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. 
+. use "$TEMP\spelldata.dta", clear  
+(30 Jul 2021)
+
+. 
+. **REMOVE??? 
+. * generate a variable for each possible value of ${spelltype}  (22 values)
+. forvalues i = 1(1)22 {
+  2. clonevar educ`i' =  ${spelltype}  if ${spelltype} ==`i'
+  3.  display `i'
+  4. }
+(219,711 missing values generated)
+1
+(610,333 missing values generated)
+2
+(581,739 missing values generated)
+3
+(612,268 missing values generated)
+4
+(623,095 missing values generated)
+5
+(623,720 missing values generated)
+6
+(592,871 missing values generated)
+7
+(617,246 missing values generated)
+8
+(618,904 missing values generated)
+9
+(608,645 missing values generated)
+10
+(619,219 missing values generated)
+11
+(621,646 missing values generated)
+12
+(617,841 missing values generated)
+13
+(616,435 missing values generated)
+14
+(580,901 missing values generated)
+15
+(622,635 missing values generated)
+16
+(619,010 missing values generated)
+17
+(621,181 missing values generated)
+18
+(616,990 missing values generated)
+19
+(622,442 missing values generated)
+20
+(623,278 missing values generated)
+21
+(609,060 missing values generated)
+22
+
+. 
+. save "$TEMP\spelldata_short.dta", replace
+(file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_short.dta not found)
+I/O error writing .dta file
+    Usually such I/O errors are caused by the disk or file system being full.
+r(693);
+
+end of do-file
+
+r(693);
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. save "$TEMP\spelldata_short.dta", replace
+(file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_short.dta not found)
+I/O error writing .dta file
+    Usually such I/O errors are caused by the disk or file system being full.
+r(693);
+
+end of do-file
+
+r(693);
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. use "$TEMP\spelldata.dta", clear  
+(30 Jul 2021)
+
+. 
+. **REMOVE??? 
+. * generate a variable for each possible value of ${spelltype}  (22 values)
+. forvalues i = 1(1)22 {
+  2. clonevar educ`i' =  ${spelltype}  if ${spelltype} ==`i'
+  3.  display `i'
+  4. }
+(219,711 missing values generated)
+1
+(610,333 missing values generated)
+2
+(581,739 missing values generated)
+3
+(612,268 missing values generated)
+4
+(623,095 missing values generated)
+5
+(623,720 missing values generated)
+6
+(592,871 missing values generated)
+7
+(617,246 missing values generated)
+8
+(618,904 missing values generated)
+9
+(608,645 missing values generated)
+10
+(619,219 missing values generated)
+11
+(621,646 missing values generated)
+12
+(617,841 missing values generated)
+13
+(616,435 missing values generated)
+14
+(580,901 missing values generated)
+15
+(622,635 missing values generated)
+16
+(619,010 missing values generated)
+17
+(621,181 missing values generated)
+18
+(616,990 missing values generated)
+19
+(622,442 missing values generated)
+20
+(623,278 missing values generated)
+21
+(609,060 missing values generated)
+22
+
+. 
+. save "$TEMP\spelldata_short.dta", replace 
+(file Z:\Eigene Dateien\Migrants and Education\03 Analysis\01_data\TEMP\spelldata_short.dta not found)
+I/O error writing .dta file
+    Usually such I/O errors are caused by the disk or file system being full.
+r(693);
+
+end of do-file
+
+r(693);
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. 
+. ***********************************************************************************************************
+. ***********************************************************************************************************
+. ***     Educational trajectories of students of migrant and non-migrant descent in Germany      *******************
+. ***********************************************************************************************************
+. ***********************************************************************************************************
+. 
+. 
+. ************************************************************************
+. *************     0. Basic setting     *********************************
+. ************************************************************************
+. 
+. 
+. *** clear
+. clear all
+
+. 
+. *** Set version
+. *version STATA 16 SE
+. 
+. *** Control monitor output
+. set more off
+
+. set logtype text
+
+. set linesize 255 
+
+. 
+. 
+. 
+. ************************************************************************
+. ************* 1. Definition of Globals *********************************
+. ************************************************************************
+. 
+. global researcher "Maria"
+
+. 
+. 
+. 
+. 
+. if "$researcher" == "Alessandro" {
+. 
+. global WORKDIR "Z:\Eigene Dateien\Migrants and Education\03 Analysis"
+. 
+. global DATA "$WORKDIR\01_data" 
+. global TEMP "$WORKDIR\01_data\TEMP"
+. global DO "$WORKDIR\02_code"
+. global LOG     "$WORKDIR\03_log" /* hier soll das log-file gespeichert werden */
+. global DESC "$WORKDIR\04_graphs"
+. global GRAPH "$WORKDIR\05_tables"
+. 
+. }
+
+. 
+. 
+. 
+. if "$researcher" == "Maria" {
+. 
+. global WORKDIR "Z:Eigene Dateien\GitHub\CILS4EU_mig\03 Analysis"
+. 
+. 
+. global DATA "C:\Users\hornunma\Desktop\DATA\CILS4EU_mig" 
+. global TEMP "C:\Users\hornunma\Desktop\DATA\TEMP"
+. global DO "$WORKDIR\02_code"
+. global LOG     "$WORKDIR\03_log" /* hier soll das log-file gespeichert werden */
+. global DESC "$WORKDIR\04_graphs"
+. global GRAPH "$WORKDIR\05_tables"
+. 
+. }
+
+. 
+. 
+. 
+. 
+. 
+end of do-file
+
+. do "C:\Users\hornunma\AppData\Local\Temp\STD785c_000000.tmp"
+
+. 
+. set more off 
+
+. 
+. *current date
+. local date : di %dDNCY daily("$S_DATE", "DMY")
+
+. di "`date'"
+19012024
+
+. 
+. 
+. * create log file 
+. capture log close _all 

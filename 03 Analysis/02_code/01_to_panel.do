@@ -14,7 +14,7 @@ di "`date'"
 
 * create log file 
 capture log close _all 
-log using "$LOG\log_01_to_panel_`date'.log", replace
+log using "$LOG\log_01_to_panel_`date'_$researcher.log", replace
 
 
 ************************************************************************
@@ -32,6 +32,10 @@ use "$DATA/w6_ym_ge_v6.0.0_rv.dta", clear
 * Dataset  education and profession 
 use "$DATA/w6_ylhcs_ge_v6.0.0_rv.dta", clear
 describe
+
+ 
+order  *id   y6_ylhcs_index y6_s1_sit2a *dat* y6_ylhcs_spt2  y6_ylhcs_spt1
+br *id   y6_ylhcs_index y6_s1_sit2a *dat* y6_ylhcs_spt2  y6_ylhcs_spt1
 
   
 
@@ -58,6 +62,9 @@ fre age  if y6_ylhcs_index==1
 br if age == 22 & y6_ylhcs_index==1  
 fre y6_sample
 
+
+
+
 *clone some variables
 clonevar begm  = y6_ylhcs_begdatm
 clonevar begy  = y6_ylhcs_begdaty
@@ -70,6 +77,63 @@ clonevar birthdm     = y6_dobm
 clonevar birthdy     = y6_doby 
 
 clonevar index       = y6_ylhcs_index
+clonevar spelltype   =  y6_s1_sit2a
+
+
+
+* if y6_ylhcs_spt2 == general education replace with actual school type  y6_s1_sit2a
+
+
+local i = 18
+while `i' <= 38 {
+    replace spelltype = `i' if y6_ylhcs_spt2 == `i' - 16
+    local i = `i' + 1
+}
+
+
+recode spelltype (-99 -88 -77 =. )
+
+
+    label define spelltype ///
+    1   "lower secondary school (hauptschule)" ///
+    2   "intermediate secondary school (realschule)" ///
+    3   "combined lower and intermediate secondary school (realschule plus)" ///
+    4   "upper secondary school (gymnasium)" ///
+    5   "higher secondary vocational school (fachoberschule)" ///
+    6   "combined lower and intermediate secondary school (mittelschule)" ///
+    7   "combined lower and intermediate secondary school (regelschule)" ///
+    8   "combined lower and intermediate secondary school (sekundarschule)" ///
+    9   "combined lower and intermediate secondary school (haupt-realschule)" ///
+    10  "school for special needs (foerderschule)" ///
+    11  "rudolf-steiner school (waldorfschule)" ///
+    12  "comprehensive school (integrierte gesamtschule)" ///
+    13  "combined lower, intermediate and upper secondary school (kooperative gesamtschule)" ///
+    14  "combined lower, intermediate and upper secondary school (kooperative gesamtschule): lower secondary track (hauptschulzweig)" ///
+    15  "combined lower, intermediate and upper secondary school (kooperative gesamtschule): intermediate secondary track (realschulzweig)" ///
+    16  "combined lower, intermediate and upper secondary school (kooperative gesamtschule): upper secondary track (gymnasialzweig)" ///
+    17  "other general education school" /// 
+    18 "second chance education" ///
+    19 "apprenticeship (in a company and in school)" ///
+    20 "school-based vocational education" ///
+    21 "school for further education and training" ///
+    22 "re-training" ///
+    23 "studying" ///
+    24 "vocational preparation" ///
+    25 "other vocational education" ///
+    26 "full-time employment" ///
+    27 "contributing family worker" ///
+    28 "self-employment" ///
+    29 "part-time employment" ///
+    30 "internship/traineeship/etc." ///
+    31 "other secondary employment" ///
+    32 "maternity/parental leave" ///
+    33 "voluntary/military service" ///
+    34 "work & travel programme/stay abroad" ///
+    35 "unemployment/job-seeking" ///
+    36 "housewife/househusband" ///
+    37 "incapacity for work" ///
+    38 "other activity" , modify 
+    label values spelltype spelltype
 
 
 
@@ -180,15 +244,14 @@ count if endcm & begincm==.
 * *_correction 
  
 ************************************************************************
-**# Bookmark 3. Globals for spell file   *******************************
+**# Bookmark 3. Globals for spell data preparation   *******************
 ************************************************************************
  
-*global spellfile 		"artkalen"				/** Name of spell datafile **/
 
 global pid 			    youthid					/** Identifier for individuals in spell datafile **/
 global spellnr 			y6_ylhcs_index		    /** Identifier for spells of each person **/
-global spelltype 		y6_ylhcs_spt2			/** spelltype of spells which will be used for splitting **/
-global spells 			"1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22"					/** Values of Spelltyp for which spells between interviews shall be identified (here for example the values for vocational training. You can choose as much spelltypes you want by putting the according values of the spelltype) **/
+global spelltype 		spelltype			/** spelltype of spells which will be used for splitting **/
+global spells 			"1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23 24 25 26 27 28 29 30 31 32 33 34 35 36 37 38 "					/** Values of Spelltyp for which spells between interviews shall be identified (here for example the values for vocational training. You can choose as much spelltypes you want by putting the according values of the spelltype) **/
 
 global begin 			begincm 					/** Begin of spells **/
 global end 				endcm					/** End of spells **/
@@ -253,7 +316,7 @@ bysort ${pid} ${spellnr} (${begin} ${end}): replace ${begin} = ${begin}[_n-1] + 
  
  
 * adjust the ending so that the ending of each subspell equals to the beginning of the next subspell 
-replace ${end} = ${begin} + 1
+replace ${end} = ${begin} + 1 if ${begin}!=. 
 
 
 drop duration keep_spells
@@ -266,7 +329,6 @@ save "$TEMP\spelldata.dta", replace
  
  
 ************************************************************************
-**# Bookmark 5.   Panel data preparation *******************************
 ************************************************************************
 
 * Create a "blanco" dataset with youthid and N total observations one can merge the spelldata with 
@@ -298,7 +360,7 @@ bysort ${pid}  (${begin} ): replace ${begin} = ${begin}[_n-1] + 1 if ${begin}[_n
 
 gen endcm= 0
 * adjust the ending so that the ending of each subspell equals to the beginning of the next subspell 
-replace ${end} = ${begin} + 1
+replace ${end} = ${begin} + 1 if ${begin}!=. 
 
 
 save "$TEMP\paneldata.dta", replace
@@ -311,18 +373,30 @@ save "$TEMP\paneldata.dta", replace
 
 use "$TEMP\spelldata.dta", clear  
 
-**REMOVE??? 
+
+br if youthid== 20010102
+br if youthid== 22031118 
+
+
+
+** Generate a variable indicating the educational/spelltype status for each index/spell 
 * generate a variable for each possible value of ${spelltype}  (22 values)
-forvalues i = 1(1)22 {
-clonevar educ`i' =  ${spelltype}  if ${spelltype} ==`i'
+forvalues i = 1(1)17 {
+clonevar spell_edu`i' =  ${spelltype}  if index ==`i'
  display `i'
 }
 
+keep youthid begincm endcm index spell_edu*
+
+save "$TEMP\spelldata_short.dta", replace 
 
 
 forvalues i = 1(1)17 {
-	use "$TEMP\spelldata.dta", clear  
+	use "$TEMP\spelldata_short.dta", clear  
 	keep if index==`i'
+	keep youthid begincm endcm  index  spell_edu`i'		
+	clonevar index`i' =  index
+	drop index
 	save "$TEMP\spelldata_`i'.dta", replace
  display `i'
 }
@@ -332,13 +406,63 @@ use  "$TEMP\paneldata.dta", clear
 
 
 forvalues i = 1(1)17 {
-merge 1:1 ${pid} ${begin}  using "$TEMP\spelldata_`i'.dta", keepusing educ1 educ2 educ3 educ4 educ5 educ6 educ7 educ8 educ9 educ11 educ12 educ13 educ14 educ15 educ16 educ17 educ18 educ19 educ20 educ21 educ22gen(mergepanel`i')
+merge 1:1 ${pid} ${begin}  using "$TEMP\spelldata_`i'.dta", gen(mergepanel`i')
 display `i'
 }
 
 
-merge m:1 youthid using "$DATA/w6_ym_ge_v6.0.0_rv.dta" , keepusing (y6_doby y6_dobm  y6_sex) keep (match)
+order ${pid}  ${begin}  ${end} spell_edu* merge* 
+br
+br if  ${begin}  ==. 
 
+
+* create a variable to see how many spells are match with a cm info (could be >1 if spells overlap)
+egen matched = anycount(mergepanel1- mergepanel17), values(3)
+br ${pid}  ${begin}  ${end} spell_edu* merge* matched 
+
+drop if matched == 0
+drop index* mergepanel* 
+
+
+
+* make sure to have no duplicates (not several rows with the same starting month)
+unique(${pid}  ${begin})
+duplicates report  ${pid}  ${begin} 
+
+
+
+* create a variable with year and month
+* maybe add other time-constant variables again (or already earlier) ???  
+* double-check do-file explanations
+* umwandeln in Jahr und Monat 
+* Variable definieren (match)
+
+
+
+
+
+ gen month=month(${begin})
+ gen yr=year(${begin})
+ 
+ 
+gen begindate = clock(begincm, "YM")
+gen begy = year(begindate)
+gen begm = month(begindate)
+
+
+
+
+
+
+
+
+fre begincm 
+
+** add other important variables to the dataset 
+
+
+
+merge m:1 youthid using "$DATA/w6_ym_ge_v6.0.0_rv.dta" , keepusing (y6_doby y6_dobm  y6_sex) keep (match)
 
 
 
@@ -376,5 +500,12 @@ describe
 
 
 br youthid y6_ylhcs_index tag 
+
+**REMOVE??? 
+* generate a variable for each possible value of ${spelltype}  (22 values)
+forvalues i = 1(1)22 {
+clonevar educ`i' =  ${spelltype}  if ${spelltype} ==`i'
+ display `i'
+}
 
 
