@@ -433,16 +433,32 @@ gen age_year = age - dismonth
 drop dismonth* 
 
 
+
+
+
 order ${pid}  ${begin}  ${end}  spell_edu* matched date yr month birthcm birthd* birthy* birthm* agecm age age_y* age_m* 
 
 
 
 
+* Generate time and age of first observation per individual
+bysort youthid: egen frst_month = min(begincm)
+bysort youthid: egen frst_year = min(yr)
+bysort youthid: egen frst_age = min(age)
+
+* Checking first age - most have age 10, which makes sense
+kdensity frst_age
+
+* Question: what to do with the others?
+gen frst_age_flag = frst_age < 7
+replace frst_age_flag = 2 if frst_age >15
+label define flag 0 "Normal first age" 1 "Below 7" 2 "Above 15", replace
+label values frst_age_flag flag
 
 
+* Checking what they are doing
+ta spell_edu1 frst_age_flag, col
+ta spell_edu1 if frst_age_flag==1 // more likely to be in Rudolf Steiner school
+ta spell_edu1 if frst_age_flag==2 // more likely to be in an apprenticeship
 
-
-
-
-
-
+* Should decide what to do with these individuals, can also agnostically keep them

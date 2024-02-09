@@ -28,21 +28,20 @@ set linesize 255
 ************* 1. Definition of Globals *********************************
 ************************************************************************
 
-global researcher "Maria"
+global researcher "Alessandro"
 
 
 
 
 if "$researcher" == "Alessandro" {
 
-global WORKDIR "Z:\Eigene Dateien\Migrants and Education\03 Analysis"
+global WORKDIR "C:\Users\Alessandro Ferrara\OneDrive - Istituto Universitario Europeo\Documents\PAPERS\CILS4EU_SEQUENCE"
 
 global DATA "$WORKDIR\01_data" 
 global TEMP "$WORKDIR\01_data\TEMP"
-global DO "$WORKDIR\02_code"
-global LOG     "$WORKDIR\03_log" /* hier soll das log-file gespeichert werden */
-global DESC "$WORKDIR\04_graphs"
-global GRAPH "$WORKDIR\05_tables"
+global LOG  "$WORKDIR\03_log" 
+global GRAPH "$WORKDIR\04_graphs"
+global DESC "$WORKDIR\05_tables"
 
 }
 
@@ -56,8 +55,8 @@ global TEMP "C:\Users\hornunma\Desktop\DATA\TEMP"
 global WORKDIR "Z:Eigene Dateien\GitHub\CILS4EU_mig\03 Analysis"
 global DO "$WORKDIR\02_code"
 global LOG     "$WORKDIR\03_log" /* hier soll das log-file gespeichert werden */
-global DESC "$WORKDIR\04_graphs"
-global GRAPH "$WORKDIR\05_tables"
+global GRAPH "$WORKDIR\04_graphs"
+global DESC "$WORKDIR\05_tables"
 
 }
 
@@ -86,5 +85,5 @@ net install convertCMC, from(https://raw.githubusercontent.com/bugbunny/convertC
 *-------------+---------------------------------------------------------
 
 
- do "$DO/01_to_panel.do"	
+* do "$DO/01_to_panel.do"	
 
