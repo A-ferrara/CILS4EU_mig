@@ -567,5 +567,5 @@ recode spell_rel (0 = 0 "Single") ///
 
 ta spell_relationship
 
-
+keep youthid begincm endcm spell_relationship
 
