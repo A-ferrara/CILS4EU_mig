@@ -77,7 +77,10 @@ The child spells are in a different dataset, will treat them similarly
 
 
 * First, I distinguish between native vs. foreign-origin relationships
-recode y6_rpback2RV (-99 -88 -55 = .), gen(spelltype)
+recode y6_rpback2RV ///
+(-99 -88 -55 = 4 "Missing") (1 =1 "Native") (2 =2 "Foreign") , gen(spelltype)
+
+ta spelltype ever_relationship, miss
 
 save "$TEMP\relationdata.dta", replace 
 
@@ -101,7 +104,7 @@ forval i =2/3 {
 	
 	clonevar ongoing = y6_rp`i'ongoing
 	
-	keep youthid begm begy endm endy spelltype ongoing intmonth inty
+	keep youthid begm begy endm endy spelltype ongoing intmonth inty ever_relationship
 	
 	save "$TEMP\relrepeat`i'.dta", replace 
 
@@ -115,13 +118,8 @@ append using "$TEMP\relrepeat3.dta"
 save "$TEMP\relationdata.dta", replace
 
 
-/*
-* NOTE: I IGNORE COHABITATION AND CHILDREN FOR NOW AS IT COMPLICATES
-		THINGS SIGNIFICANTLY BECAUSE OF OVERLAPPING SPELLS
-*/
 
 
-/*
 * CREATING THE COHABITATION SPELLS
 *************************************************************************
 
@@ -137,7 +135,7 @@ clonevar ongoing = y6_rpcohab_ongoing
 
 replace spelltype = 3
 
-keep youthid begm begy endm endy spelltype ongoing intmonth inty
+keep youthid begm begy endm endy spelltype ongoing intmonth inty ever_relationship
 
 save "$TEMP\cohabitation.dta", replace 
 
@@ -148,6 +146,7 @@ append using "$TEMP\cohabitation.dta"
 save "$TEMP\relationdata.dta", replace
 
 
+/*
 * CREATING THE CHILD SPELLS
 *************************************************************************
 
@@ -202,7 +201,7 @@ label variable index "Spell index"
 
 * Labelling the spell variable
 label define spell 0 "Single" 1 "Native-origin partner" ///
-2 "Migrant-origin partner" 3 "Cohabiting" 4 "Child", replace
+2 "Migrant-origin partner" 3 "Cohabiting" 4 "Missing", replace
 label values spelltype spell
 
 
@@ -239,12 +238,13 @@ dis  maxendcm -  minbegincm   // 102
 
 * Checking youthids
 unique(youthid)
+
+
 /*
-Number of unique values of youthid is  3554
-Number of records is  6173 (with cohabitation and children) or 5475 (without)
+Number of unique values of youthid is  5820
+Number of records is  8302 (with cohabitation)
 */
 
-* Question: are the missing youthid's simply the people who never have a relationship spell?
 
 
 
@@ -278,10 +278,14 @@ bysort ${pid} (${begin} ${end}): replace ${end} = ${end} + 1 if ${end} > 0
 gen duration = ${end} - ${begin}   
 
 *if beginning or end of a spell is missing, the duration of a spell is set as zero month and the spell will not be expanded
-replace duration = 0 if ${end} ==. | ${begin} ==. // only 166 cases
+replace duration = 0 if ${end} ==. | ${begin} ==. // 2342 cases, of which 2,270 are those without ever relationship
 replace duration = 0 if duration <0   
 
 fre duration
+ta duration if ever_relationship==1
+ta duration if ever_relationship==0
+
+
 
 * multiply/expand each spell according to its duration 
 expand duration
@@ -296,6 +300,17 @@ replace ${end} = ${begin} + 1 if ${begin}!=.
 drop duration 
 order ${pid} ${begin} ${end} ${spellnr} ${spelltype}
  
+ 
+ 
+* Checking the range of months
+cap drop minbegincm maxendcm
+egen minbegincm = min(begincm) 
+dis minbegincm // 577
+egen maxendcm   = max(endcm)
+dis maxendcm // 680
+dis  maxendcm -  minbegincm   // 103
+
+
 cap drop _merge
 save "$TEMP\relspell.dta", replace 
 
@@ -307,26 +322,20 @@ save "$TEMP\relspell.dta", replace
 
 * Create a "blanco" dataset with youthid and N total observations (see dis  maxendcm -  minbegincm) to merge the spelldata with 
 
-* IMPORTANT: I use the relationship spell data for this purpose,
-* may want to use the main dataset if we have missing individuals w/o relationship
-
 use "$TEMP\relspell.dta", clear
 
 
 * Define some globals 
 global startcm 577  // start date of the earliest time observed (see minbegincm above)
-global expansion 102 // whole observation period of the sample (see dis  maxendcm -  minbegincm   // 210  above (I made 211 just to be sure))
+global expansion 103 // whole observation period of the sample (see dis  maxendcm -  minbegincm   // 210  above (I made 211 just to be sure))
 
 
 * identify the first spell of each individual (tag =1 ) 
 bys ${pid}(begincm): gen tag= _n ==1
 
-* Tag a single observation per individual
-
-
 * keep only one row for each individual
 keep if tag ==1 
-keep ${pid}
+keep ${pid} ever_relationship intcm
 unique(${pid})
 expand ${expansion}    
 sort ${pid} 
@@ -350,15 +359,32 @@ save "$TEMP\rel_paneldata.dta", replace
 use "$TEMP\rel_paneldata.dta", clear
 cap drop _merge
 merge 1:m youthid begincm endcm using "$TEMP\relspell.dta"
-bysort youthid: egen max_intcm = max(intcm)
-replace spelltype = 0 if _merge==1 & endcm<max_intcm 
+
+* First, I fill those without every any relationship
+replace spelltype=0 if ever_relationship==0
+ta _merge ever_relationship
+drop if _merge==2 & ever_relationship==0
+
+* Drop those cases with missing start/end dates completely
+bysort youthid: gen flagged = _merge==2
+bysort youthid: egen flagged_id = max(flagged)
+drop if flagged_id==1
+
+* For the rest, convert missing values before the interview to "single" spells
+replace spelltype = 0 if _merge==1 & begincm<intcm 
+
+* Only remaining missings are observations after inteview, I code them
+replace spelltype=4 if spelltype==. & begincm>=intcm
+drop _merge
+
+* Generating maximum observation for each
+cap drop maxendcm 
+bysort youthid: egen maxendcm = max(endcm)
 
 * However, I see there are some relationship overlaps! This may overestimate spells
-bysort youthid begincm endcm: gen n_rel = _n
-ta n_rel
-
-* Let's check how many cases
-unique youthid if n_rel>1 // 115 individuals 
+recode spelltype (3 4 0 =0) (1 2 =1), gen(relationship)
+bysort youthid begincm endcm relationship: gen n_rel = _n 
+unique youthid if n_rel>1 // 101 individuals 
 
 * Flagging them for now, may want to drop
 bysort youthid (begincm endcm), sort: gen multi_rel_flag = sum(n_rel-1)>=1
@@ -371,31 +397,36 @@ drop tag ndistinct
 
 // Almost all of the overlapping relationships are from same original
 // So we count as the same episode for our purposes
-// Those with double relationship and different origins I keep native
-// Can change approach later on
-
 duplicates tag youthid begincm endcm spelltype, gen(tag)
 drop if tag>0
 drop tag
 
-duplicates tag youthid begincm endcm, gen(tag)
-drop if tag>0 & spelltype==2
+// Those with double relationship and different origins I keep native
+// Can change approach later on
+duplicates tag youthid begincm endcm relationship, gen(tag)
+drop if tag>0 & relationship==1 & spelltype==2
 drop tag
 
 
 * Must now create new index for spells
 bysort youthid (begincm endcm spelltype): ///
-gen index2 = sum(spelltype != spelltype[_n-1] & spelltype!=.)
-replace index2 = .  if endcm>max_intcm
-drop max_intcm
-drop index
-rename index2 index
+gen new_index2 = sum(spelltype!= spelltype[_n-1] & spelltype != spelltype[_n-2])
 
-* Dropping extra empty spells created
-drop if spelltype==.
+bysort youthid (begincm endcm spelltype): ///
+replace new_index2 = new_index2[_n-2] if spelltype==spelltype[_n-2]
+
+replace new_index = .  if begincm>intcm
+cap drop index
+rename new_index index
+
+ta index //  maximum 13
+
 
 * Cehcking duplicates
 duplicates report youthid begincm endcm index
+
+
+ta index
 
 ************************************************************************
 **# Bookmark 6.   Merging    *******************************************
@@ -404,7 +435,7 @@ duplicates report youthid begincm endcm index
 
 ** Generate a variable indicating the educational/spelltype status for each index/spell (in this case total 17 = (max)y6_ylhcs_index))
 * generate a variable for each possible value of ${spelltype}  (22 values)
-forvalues i = 1(1)16 {
+forvalues i = 1(1)13 {
 clonevar spell_rel`i' =  ${spelltype}  if index ==`i'
  display `i'
 }
@@ -414,7 +445,7 @@ save "$TEMP\relspell_short.dta", replace
 
 
 ** here, I create one separate dataset for each spell (because sometimes spells overlap which means merge doesn't work if we'd do it with the complete dataset)
-forvalues i = 1(1)16 {
+forvalues i = 1(1)13 {
 	use "$TEMP\relspell_short.dta", clear  
 	keep if index==`i'
 	keep youthid begincm endcm birthcm index  spell_rel`i'		 // add here any variables you'd want to keep from the spelldataset 
@@ -430,7 +461,7 @@ forvalues i = 1(1)16 {
 use  "$TEMP\rel_paneldata.dta", clear 
 
 * merge each separate spell dataset to the 'blanco' dataset created above
-forvalues i = 1(1)17 {
+forvalues i = 1(1)13 {
 merge 1:1 ${pid} ${begin} ${end} using "$TEMP\relspell_`i'.dta", gen(mergepanel`i')
 display `i'
 }
@@ -442,7 +473,7 @@ br if  ${begin}  ==.
 
 
 * create a variable to see how many spells match with a cm info (could be >1 if spells overlap)
-egen matched = anycount(mergepanel1- mergepanel17), values(3)  
+egen matched = anycount(mergepanel1- mergepanel13), values(3)  
 br ${pid}  ${begin}  ${end}  merge* matched 
 
 
@@ -512,7 +543,29 @@ gen age_year = age - dismonth
 
 drop dismonth* 
 
+sort youthid begincm endcm
+order youthid begincm endcm ///
+spell_rel1 spell_rel2 spell_rel3 spell_rel4 spell_rel5 spell_rel6 spell_rel7 ///
+spell_rel8 spell_rel9 spell_rel10 spell_rel11 spell_rel12 spell_rel13
 
+
+* CREATING SINGLE SPELL VARAIBLE
+********************************************************************************
+
+
+gen spell_rel = ""
+forval i =1/13 {
+	replace spell_rel = spell_rel + string(spell_rel`i')
+
+}
+
+destring spell_rel, ignore(".") replace
+recode spell_rel (0 = 0 "Single") ///
+(1 = 1 "Rel: nat-origin") (2 = 2 "Rel: mig-origin") ///
+(13 31 = 3 "Cohab: nat-origin") (23 32 = 4 "Cohab: mig-origin") ///
+(4 = 5 "Missing") (3=6 "Cohab: unclear"), gen(spell_relationship)
+
+ta spell_relationship
 
 
 
