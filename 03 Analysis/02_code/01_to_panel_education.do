@@ -554,7 +554,7 @@ tab age if start == begincm
 histogram age if start == begincm
 
 
-forval year = 2013/2019 {
+forval year = 2012/2020{
     gen nov_`year' = ym(`year',11)
 }
 
@@ -563,24 +563,23 @@ forval year = 2013/2019 {
 
 * Set the end date of each individual as well (november again)  (WHAT AGE?? )
 gen end = .
-replace end = nov_2013 if birthyr == 1992  & birthmonth <= 6 
-replace end = nov_2014 if birthyr == 1992  & birthmonth > 6
+replace end = nov_2012 if birthyr == 1992  & birthmonth <= 6 
+replace end = nov_2013 if birthyr == 1992  & birthmonth > 6
 
-replace end = nov_2014 if birthyr == 1993  & birthmonth <= 6 
-replace end = nov_2015 if birthyr == 1993  & birthmonth > 6
+replace end = nov_2013 if birthyr == 1993  & birthmonth <= 6 
+replace end = nov_2014 if birthyr == 1993  & birthmonth > 6
 
-replace end = nov_2015 if birthyr == 1994  & birthmonth <= 6 
-replace end = nov_2016 if birthyr == 1994  & birthmonth > 6
+replace end = nov_2014 if birthyr == 1994  & birthmonth <= 6 
+replace end = nov_2015 if birthyr == 1994  & birthmonth > 6
 
-replace end = nov_2016 if birthyr == 1995  & birthmonth <= 6 
-replace end = nov_2017 if birthyr == 1995  & birthmonth > 6
+replace end = nov_2015 if birthyr == 1995  & birthmonth <= 6 
+replace end = nov_2016 if birthyr == 1995  & birthmonth > 6
 
-replace end = nov_2017 if birthyr == 1996  & birthmonth <= 6 
-replace end = nov_2018 if birthyr == 1996  & birthmonth > 6
+replace end = nov_2016 if birthyr == 1996  & birthmonth <= 6 
+replace end = nov_2017 if birthyr == 1996  & birthmonth > 6
 
-replace end = nov_2018 if birthyr == 1997  & birthmonth <= 6
-replace end = nov_2019 if birthyr == 1997  & birthmonth > 6
-
+replace end = nov_2017 if birthyr == 1997  & birthmonth <= 6
+replace end = nov_2018 if birthyr == 1997  & birthmonth > 6
 
 
 tab age if end == begincm
@@ -678,7 +677,7 @@ bysort youthid : gen tag4 = 1  if youthid == youthid[_n-1] & tag3 ==1 & tag3[_n-
 br youthid begincm endcm *spell_* 
 
 
-gen spell = 
+gen spell = . 
 
 
 sort spell_edu* 
