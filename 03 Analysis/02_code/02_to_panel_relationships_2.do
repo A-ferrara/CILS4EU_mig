@@ -101,10 +101,12 @@ forval i =2/3 {
 
 	clonevar endm        = y6_rp`i'endm
 	clonevar endy        = y6_rp`i'endy
+
 	
 	clonevar ongoing = y6_rp`i'ongoing
 	
-	keep youthid begm begy endm endy spelltype ongoing intmonth inty ever_relationship
+	keep youthid begm begy endm endy spelltype ///
+	ongoing intmonth inty ever_relationship birthdy birthdm
 	
 	save "$TEMP\relrepeat`i'.dta", replace 
 
@@ -135,7 +137,8 @@ clonevar ongoing = y6_rpcohab_ongoing
 
 replace spelltype = 3
 
-keep youthid begm begy endm endy spelltype ongoing intmonth inty ever_relationship
+keep youthid begm begy endm endy spelltype ///
+ongoing intmonth inty ever_relationship birthdy birthdm
 
 save "$TEMP\cohabitation.dta", replace 
 
@@ -335,7 +338,7 @@ bys ${pid}(begincm): gen tag= _n ==1
 
 * keep only one row for each individual
 keep if tag ==1 
-keep ${pid} ever_relationship intcm
+keep ${pid} ever_relationship intcm birthdy birthdm birthcm
 unique(${pid})
 expand ${expansion}    
 sort ${pid} 
@@ -567,5 +570,78 @@ recode spell_rel (0 = 0 "Single") ///
 
 ta spell_relationship
 
-keep youthid begincm endcm spell_relationship
+*keep youthid begincm endcm spell_relationship
+
+
+
+* SWITCHING TO AGE-BASED FORMAT
+********************************************************************************
+
+
+* Generating the start date
+forval year = 2004/2009 {
+    gen nov_`year' = ym(`year',11)
+}
+
+gen start = .
+replace start = nov_2004 if birthyr == 1992  & birthmonth <= 6 
+replace start = nov_2005 if birthyr == 1992  & birthmonth > 6
+
+replace start = nov_2005 if birthyr == 1993  & birthmonth <= 6 
+replace start = nov_2006 if birthyr == 1993  & birthmonth > 6
+
+replace start = nov_2006 if birthyr == 1994  & birthmonth <= 6 
+replace start = nov_2007 if birthyr == 1994  & birthmonth > 6
+
+replace start = nov_2007 if birthyr == 1995  & birthmonth <= 6 
+replace start = nov_2008 if birthyr == 1995  & birthmonth > 6
+
+replace start = nov_2008 if birthyr == 1996  & birthmonth <= 6 
+replace start = nov_2009 if birthyr == 1996  & birthmonth > 6
+
+replace start = nov_2009 if birthyr == 1997  & birthmonth <= 6
+replace start = nov_2009 if birthyr == 1997  & birthmonth > 6
+
+tab age if start == begincm, miss
+
+
+
+
+* Generating the end date
+
+forval year = 2013/2019 {
+    gen nov_`year' = ym(`year',11)
+}
+
+
+gen end = .
+replace end = nov_2013 if birthyr == 1992  & birthmonth <= 6 
+replace end = nov_2014 if birthyr == 1992  & birthmonth > 6
+
+replace end = nov_2014 if birthyr == 1993  & birthmonth <= 6 
+replace end = nov_2015 if birthyr == 1993  & birthmonth > 6
+
+replace end = nov_2015 if birthyr == 1994  & birthmonth <= 6 
+replace end = nov_2016 if birthyr == 1994  & birthmonth > 6
+
+replace end = nov_2016 if birthyr == 1995  & birthmonth <= 6 
+replace end = nov_2017 if birthyr == 1995  & birthmonth > 6
+
+replace end = nov_2017 if birthyr == 1996  & birthmonth <= 6 
+replace end = nov_2018 if birthyr == 1996  & birthmonth > 6
+
+replace end = nov_2018 if birthyr == 1997  & birthmonth <= 6
+replace end = nov_2019 if birthyr == 1997  & birthmonth > 6
+
+
+tab age if end == endcm
+
+
+
+
+
+
+
+
+
 
