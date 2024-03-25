@@ -480,8 +480,6 @@ drop dismonth*
 order ${pid}  ${begin}  ${end}  spell_edu* matched date yr month birthcm birthd* birthy* birthm* agecm age age_y* age_m* 
 
 
-
-
 * Generate time and age of first observation per individual
 bysort youthid: egen frst_month = min(begincm)
 bysort youthid: egen frst_year = min(yr)
@@ -583,25 +581,18 @@ replace end = nov_2018 if birthyr == 1997  & birthmonth > 6
 
 
 tab age if end == begincm
-
 histogram age if end == begincm
+
+
 ** create one spell for each individual, if overlapping give preference to educational spells
-
-
-
 // There is a bit of an age range since we check the age until June and then start in November 
-
-
 
 * Drop observations before the start date
 bysort youthid: drop if begincm < start
 
 
-
-
 * Drop observations after the start date 
 bysort youthid: drop if begincm > end
-
 
 
 * identify the first observation 
@@ -612,6 +603,8 @@ bysort youthid: gen tag1 = 1 if _n==1
 
 * calculate the number of rows missing (until start)
 gen missing_start =   min_begincm+1 - start   if tag1 == 1 
+
+
 
 
 
@@ -669,6 +662,46 @@ bysort youthid : gen tag4 = 1  if youthid == youthid[_n-1] & tag3 ==1 & tag3[_n-
 
 
 
+* Rerun all the information on age, month, etc
+
+capture drop  date month yr age_year age_month  age agecm 
+
+
+* Add some time variables (for the year and months of spell) 
+clonevar dm = begincm 
+* to year and month data 
+format %tm dm
+format dm %10.0g
+gen date = dofm(dm)
+
+format date %d
+gen month=month(date)
+gen yr=year(date)
+
+
+drop date
+rename dm date 
+format %tm date
+
+
+* Add information on the age 
+
+gen agecm = begincm - birthcm
+
+*age in years with decimals
+gen age = agecm/12 
+gen dismonth= age- (yr- birthyr)
+replace dismonth = age+1 - (yr- birthyr) if month < birthmonth //for people where the calculation above doesn't work because the months reported is before their birthday in that year 
+gen dismonth_new = dismonth*12
+
+*age in months (rounded)
+gen age_month = round(dismonth_new ,0.01)
+
+*age in years (full numbers)
+gen age_year = age - dismonth 
+
+
+br youthid begincm endcm tag1 tag2 missing_start start yr month date age_year  if youthid == 20020204
 
 * Check the spelltype variable
 
@@ -711,8 +744,8 @@ egen spell_edu_test = anymatch(spell_edu1 - spell_edu17), values(4)
 
 */ 
 
-
-gen spell_edu = .
+cap drop edu_spell
+gen edu_spell = .
 
 global  spell_edu_vars  "spell_edu1 spell_edu2 spell_edu3 spell_edu4 spell_edu5 spell_edu6 spell_edu7 spell_edu8 spell_edu9 spell_edu10                  spell_edu11 spell_edu12 spell_edu13 spell_edu14 spell_edu15 spell_edu16 spell_edu17"
 
@@ -750,7 +783,7 @@ foreach var of global spell_edu_vars {
 
 sort youthid begincm
 
-* replace the gap fillers (until start and end date) with missing (are filled because of the expand code)
+* replace the gap fillers (until start and end date) with missing (are filled right now because of the expand code)
 replace spell_edu = 9 if tag3==1 & tag4!=1 
 replace spell_edu = 9 if tag1==1 & tag2!=1 
 
@@ -765,12 +798,162 @@ br youthid begincm endcm spell_edu
 
 
 
+tab spell_edu ,m 
+
+bysort begincm: tab spell_edu ,m 
+
+
+* Generate a variable if any information on education are missing 
+gen missing = 0
+replace missing = 1 if  spell_edu == 9
+
+
+
+** Overall missing patterns by century months 
+quietly tab  begincm missing , matcell(table)  matrow(names)  m
+putexcel set "$DESC\Missingpattern", modify sheet("Overall missing") 
+putexcel B1 = matrix(table), names hcenter
+putexcel B2 = matrix(names)
+
+putexcel B1 = "Centurymonth"
+putexcel C1 = "Non-missing observations"
+putexcel D1 = "Missing observations"
+
+putexcel E1 = "SUM"
+putexcel F1 = "Percentage Non-missing"
+
+forvalues j = 2/120 {
+    putexcel E`j' = formula(=SUM(C`j':D`j'))
+    putexcel F`j' = formula(=C`j'/E`j')
+
+}
+
+
+* Set a months and a year variable to get an idea what is meant by the cm variable 
+local start_begincm 538
+local end_begincm 705
+
+local row_index 2
+
+forvalues begincm = `start_begincm'/`end_begincm' {
+    quietly tab month if begincm == `begincm', matrow(names)
+    matlist names
+    putexcel H`row_index' = matrix(names)
+
+    quietly tab yr if begincm == `begincm', matrow(names)
+    matlist names
+    putexcel I`row_index' = matrix(names)
+    
+    local row_index = `row_index' + 1
+}
+
+
+** Missing patterns by birth cohorts and century months  
+
+* 1993 1994 1995 1996 1997 1998
+
+local years "1992 1994 1995 1996 1997 1998 "
+
+foreach year in `years' {
+    * Tabulate missing data by birth year
+    quietly tab begincm missing if birthyr == `year', matcell(missing_table) matrow(missing_names) m
+    putexcel set "$DESC\Missingpattern_education", modify sheet("Birthyr`year'")
+    putexcel B1 = matrix(missing_table), names 
+    putexcel B2 = matrix(missing_names)
+    putexcel B1 = "Centurymonth"
+    putexcel C1 = "Non-missing observations"
+    putexcel D1 = "Missing observations"
+    putexcel E1 = "SUM"
+    putexcel F1 = "Percentage Non-missing"
+
+
+forvalues j = 2/120 {
+    putexcel E`j' = formula(=SUM(C`j':D`j'))
+    putexcel F`j' = formula(=C`j'/E`j')
+ 
+
+    * Tabulate age data by birth year
+    quietly tab begincm age_year if birthyr == `year', matcell(age_table) matrow(age_names) m
+    putexcel set "$DESC\Missingpattern_education", modify sheet("Birthyr`year'")
+    putexcel G1 = matrix(age_table), names 
+    putexcel G2 = matrix(age_names)
+    putexcel G1 = "Centurymonth"
+	
+    * Write column labels to Excel
+    putexcel H1 = "Age (in years) 12"
+    putexcel I1 = "13"
+    putexcel J1 = "14"
+    putexcel K1 = "15"
+    putexcel L1 = "16"
+    putexcel M1 = "17"
+    putexcel N1 = "18"
+    putexcel O1 = "19"
+    putexcel P1 = "20"
+    putexcel Q1 = "21"	
+	   }
+
+	   
+forvalues j = 2/120 {
+    putexcel G`j' = formula(= B`j') 
+}
+}
+
+** things to change in the excel table:
+** Inform about the age of the sample?? (depending on the birth cohort?)
+** make a new column which indicated, what the percentage of missing information is
+** make an excel table for cm and by birth year 
+
+
+
 
 /// **to-do: 
+
+** spelltype with robtype (and priorities)
+
+* Calculate the average time individuals spend in each spelltype 
+* Calculate the longest and the shortest spelltype 
+
+** think about gaps before and after but also within (and investigate these further); should we sum up our observations into 6-months periods? 	#
+*tsspell command?
+
+sort youthid begincm
+
+
+
+tsset 
+by youthid: gen byte begin = spell_edu!= spell_edu[_n-1]
+
+
+tsset crsp_fundno qdatev
+tsspell exp_ratio
+
+* number of spells
+by id, sort: egen spellno = max(spell_edu)
+	
+by id spell, sort: gen length = _N	
+	
+by id spell, sort: gen length = _N	
+	
+* Consecutive duration by spell type per individual
+/// longest consecutive duration in each spell type by individual 
+/// shortest consecutive duration in each spell type by individual 	
+	
+	
+	
+	/// **to-do: 
 
 ** spelltype with robtype (and priorities)
 ** think about gaps before and after but also within (and investigate these further); should we sum up our observations into 6-months periods? 
 ** here, one could check the duration of spells: how long are individuals generally in one spell?? 
 
 
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
