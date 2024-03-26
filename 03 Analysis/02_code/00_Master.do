@@ -28,7 +28,7 @@ set linesize 255
 ************* 1. Definition of Globals *********************************
 ************************************************************************
 
-global researcher "Alessandro"
+global researcher "Maria"
 
 
 
@@ -50,9 +50,10 @@ global DESC "$WORKDIR\05_tables"
 if "$researcher" == "Maria" {
 
 global DATA "C:\Users\hornunma\Desktop\DATA\CILS4EU_mig" 
+
 global TEMP "C:\Users\hornunma\Desktop\DATA\TEMP"
 
-global WORKDIR "Z:Eigene Dateien\GitHub\CILS4EU_mig\03 Analysis"
+global WORKDIR "Z:Eigene Dateien\Migrants and Education\03 Analysis"
 global DO "$WORKDIR\02_code"
 global LOG     "$WORKDIR\03_log" /* hier soll das log-file gespeichert werden */
 global GRAPH "$WORKDIR\04_graphs"
@@ -85,5 +86,5 @@ net install convertCMC, from(https://raw.githubusercontent.com/bugbunny/convertC
 *-------------+---------------------------------------------------------
 
 
-* do "$DO/01_to_panel.do"	
+ do "$DO/01_to_panel_education.do"	
 

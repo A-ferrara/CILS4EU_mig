@@ -178,7 +178,7 @@ tab robtype y6_s2_sit2b, m
 tab robtype y6_ylhcs_spt2, m 
 
 
-// it seems as if don't know and no answer in y6_s1_sit2a,is general education or second chance (see y6_ylhcs_spt2), so I'd recode the missings in spelltype to 'other'
+// it seems as if don't know and no answer in y6_s1_sit2a, is general education or second chance (see y6_ylhcs_spt2), so I'd recode the missings in spelltype to 'other'
 replace robtype  = 5 if robtype ==. 
 
 
@@ -508,6 +508,13 @@ use "$TEMP\educ.dta", clear
 
 
 
+************************************************************************
+**# Bookmark 7. Set time frame  ****************************************
+************************************************************************
+
+
+
+
 * Generate cm for all novembers from 2004-2009, 2013-2019
 
 // https://www.calculator.net/age-calculator.html
@@ -822,7 +829,7 @@ putexcel D1 = "Missing observations"
 putexcel E1 = "SUM"
 putexcel F1 = "Percentage Non-missing"
 
-forvalues j = 2/120 {
+forvalues j = 2/170 {
     putexcel E`j' = formula(=SUM(C`j':D`j'))
     putexcel F`j' = formula(=C`j'/E`j')
 
@@ -898,59 +905,234 @@ forvalues j = 2/120 {
 }
 }
 
-** things to change in the excel table:
-** Inform about the age of the sample?? (depending on the birth cohort?)
-** make a new column which indicated, what the percentage of missing information is
-** make an excel table for cm and by birth year 
+
+
+local months "nov_2004 nov_2005 nov_2006 nov_2007 nov_2008 nov_2009"
+
+foreach month in `months' {
+    * Tabulate missing data by month
+    tab begincm missing if `month' == min_begincm, matcell(missing_table) matrow(missing_names) m
+    putexcel set "$DESC\Missingpattern_education", modify sheet("`month'")
+    putexcel B1 = matrix(missing_table), names 
+    putexcel B2 = matrix(missing_names)
+    putexcel B1 = "Centurymonth"
+    putexcel C1 = "Non-missing observations"
+    putexcel D1 = "Missing observations"
+    putexcel E1 = "SUM"
+    putexcel F1 = "Percentage Non-missing"
+	
+
+	
+forvalues j = 2/120 {
+    putexcel E`j' = formula(=SUM(C`j':D`j'))
+    putexcel F`j' = formula(=C`j'/E`j')
+ 
+
+    * Tabulate age data by birth year
+    quietly tab begincm age_year if `month' == min_begincm, matcell(age_table) matrow(age_names) m
+    putexcel set "$DESC\Missingpattern_education", modify sheet("`month'")
+    putexcel G1 = matrix(age_table), names 
+    putexcel G2 = matrix(age_names)
+    putexcel G1 = "Centurymonth"
+	
+    * Write column labels to Excel
+    putexcel H1 = "Age (in years) 12"
+    putexcel I1 = "13"
+    putexcel J1 = "14"
+    putexcel K1 = "15"
+    putexcel L1 = "16"
+    putexcel M1 = "17"
+    putexcel N1 = "18"
+    putexcel O1 = "19"
+    putexcel P1 = "20"
+    putexcel Q1 = "21"	
+	   }
+
+	   
+forvalues j = 2/120 {
+    putexcel G`j' = formula(= B`j') 
+}
+}
+
+
+* 
+sort youthid begincm 
+br youthid begincm spell_edu age*  min_begincm 
 
 
 
 
-/// **to-do: 
+* Calculate the number of month individuals spend in each educational state 
 
-** spelltype with robtype (and priorities)
+forvalues j = 1/9 {
+cap drop count_edu`j'
+egen count_edu`j' = total(spell_edu == `j'), by(youthid)
+tab count_edu`j'
+} 
 
-* Calculate the average time individuals spend in each spelltype 
-* Calculate the longest and the shortest spelltype 
+label variable count_edu1 "N months in Lower secondary"
+label variable count_edu2 "N months in Intermediate secondary"
+label variable count_edu3 "N months in Upper secondary"
+label variable count_edu4 "N months in Tertiary"
+label variable count_edu5 "N months in Other"
+label variable count_edu6 "N months in Apprenticeship"
+label variable count_edu7 "N months in Employment"
+label variable count_edu8 "N months in Out of employment"
+label variable count_edu9 "N months in Missing"
 
-** think about gaps before and after but also within (and investigate these further); should we sum up our observations into 6-months periods? 	#
-*tsspell command?
 
+
+
+************************************************************************
+**# Bookmark 7. Investigate time series data   *************************
+************************************************************************
+
+
+* Declare data to be time series 
+tsset youthid begincm 
+tsspell spell_edu
+
+
+// Sort the data by 'youthid' and 'begincm'
 sort youthid begincm
 
+// Generate a new variable 'row_number' that represents the row number within each individual
+egen row_number = seq(), by(youthid)
 
 
-tsset 
-by youthid: gen byte begin = spell_edu!= spell_edu[_n-1]
 
 
-tsset crsp_fundno qdatev
-tsspell exp_ratio
+* length of the sequences for each sequence 
+tab _seq if _end ==1 
 
-* number of spells
-by id, sort: egen spellno = max(spell_edu)
-	
-by id spell, sort: gen length = _N	
-	
-by id spell, sort: gen length = _N	
-	
-* Consecutive duration by spell type per individual
-/// longest consecutive duration in each spell type by individual 
-/// shortest consecutive duration in each spell type by individual 	
-	
-	
-	
-	/// **to-do: 
-
-** spelltype with robtype (and priorities)
-** think about gaps before and after but also within (and investigate these further); should we sum up our observations into 6-months periods? 
-** here, one could check the duration of spells: how long are individuals generally in one spell?? 
+sum _seq if _end ==1, det 
 
 
-	
-	
-	
-	
+/*
+ sum _seq if _end ==1, det 
+
+                            _seq
+-------------------------------------------------------------
+      Percentiles      Smallest
+ 1%            1              1
+ 5%            1              1
+10%            2              1       Obs              24,281
+25%            4              1       Sum of wgt.      24,281
+
+50%           12                      Mean           19.91125
+                        Largest       Std. dev.       20.4282
+75%           32             97
+90%           51             97       Variance       417.3114
+95%           68             97       Skewness       1.284021
+99%           80             97       Kurtosis       3.827183
+
+*/ 
+
+
+** -- > on average, each sequence lasts around 20 months, with a minimum of 1 and a maximum of 97 months 
+
+egen meansequence = mean(_seq), by(youthid)
+label variable meansequence  "Mean sequence length per individual"
+
+
+* longest and shortest consecutive sequence for each individual (in months)
+
+egen max_sequence = max(_seq), by(youthid)
+egen min_sequence = min(_seq), by(youthid)
+
+
+* type of longest and shortest consecutive sequence for each individual 
+
+gen max_eduspell = spell_edu if max_sequence == _seq 
+egen maxmax_eduspell = max(max_eduspell) , by(youthid)
+drop max_eduspell
+rename maxmax_eduspell   max_eduspell 
+
+label variable max_eduspell  "Type of longest consecutive sequence per individual"
+label values max_eduspell  spell_edu
+
+
+gen min_eduspell = spell_edu if min_sequence == _seq 
+egen minmin_eduspell = max(min_eduspell) , by(youthid)
+drop min_eduspell
+rename minmin_eduspell   min_eduspell 
+
+label variable min_eduspell  "Type of shortest consecutive sequence per individual"
+label values min_eduspell  spell_edu
+
+
+fre max_eduspell if begincm == min_begincm 
+fre min_eduspell if begincm == min_begincm 
+
+
+* Number of consecutive months in each spelltype by pid
+///prioritize the highest months 
+
+forvalues j = 1/9 {
+by youthid: gen cons_edu`j'  = 0
+replace cons_edu`j' = _seq if _end ==1 & spell_edu == `j'
+egen maxcons_edu`j' = max(cons_edu`j'), by(youthid)
+drop cons_edu`j' 
+rename maxcons_edu`j'  cons_edu`j'
+} 
+
+
+label variable cons_edu1 "N conseq months in Lower secondary"
+label variable cons_edu2 "N conseq months in Intermediate secondary"
+label variable cons_edu3 "N conseq months in Upper secondary"
+label variable cons_edu4 "N conseq months in Tertiary"
+label variable cons_edu5 "N conseq months in Other"
+label variable cons_edu6 "N conseq months in Apprenticeship"
+label variable cons_edu7 "N conseq months in Employment"
+label variable cons_edu8 "N conseq months in Out of employment"
+label variable cons_edu9 "N conseq months in Missing"
+
+
+* Identify the first and the last spell per individual
+
+by youthid: gen first_eduspell = spell_edu if _spell == 1 
+egen max_first_eduspell  = max(first_eduspell), by(youthid)
+drop first_eduspell
+rename max_first_eduspell first_eduspell
+label values  first_eduspell spell_edu
+
+egen N_spells = max(_spell), by (youthid)
+
+
+by youthid: gen last_eduspell = spell_edu if _spell == N_spells 
+egen min_last_eduspell = min(last_eduspell), by(youthid)
+drop last_eduspell
+rename min_last_eduspell last_eduspell
+label values last_eduspell spell_edu
+
+
+* Check the length of the first spell 
+
+sum _seq if _end==1 & _spell == 1 , det  
+bysort birthyr: sum _seq if _end==1 & _spell == 1 , det  
+
+
+
+* Number of consecutive months in missing by birthcohort 
+
+bysort birthyr: sum cons_edu9 if begincm == min_begincm , det 
+bysort birthyr: sum count_edu9 if begincm == min_begincm , det 
+
+
+sort youthid begincm 
+br youthid begincm spell_edu _* *seq*  *age* if birthyr == 1995
+
+
+* First and last spell by birth cohort 
+bysort  birthyr:  fre  first_eduspell last_eduspell 
+
+
+
+sort youthid begincm 
+
+br youthid begincm date *age* spell_edu _*  count_* cons_* 
+
+
 	
 	
 	
