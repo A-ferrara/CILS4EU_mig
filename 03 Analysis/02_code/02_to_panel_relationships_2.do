@@ -17,11 +17,13 @@ use "$DATA/w6_ylhcp_ge_v6.0.0_rv.dta", clear
 
  
 *  add year of birth from the other dataset 
-merge m:1 youthid using "$DATA/w6_ym_ge_v6.0.0_rv.dta" , keepusing (y6_doby y6_dobm  y6_sex y6_date2 y6_intdat_ymRV)
+merge m:1 youthid using "$DATA/w6_ym_ge_v6.0.0_rv.dta" , ///
+keepusing (y6_doby y6_dobm  y6_sex y6_date2 y6_intdat_ymRV)
 recode _merge (3= 1 "Had relationship") (2 =0 "Never relationship"), gen(ever_relationship)
 drop _merge 
+replace ever_relationship = .  if y6_date2 == -66
 
-ta ever_relationship // 2,270 cases never had a relationship - i.e. always single
+ta ever_relationship // 1,524 cases never had a relationship - i.e. always single
 ta y6_rp1startyRV ever_relationship, miss
 
 * Get months and year of the interview separately 
@@ -287,6 +289,7 @@ replace duration = 0 if duration <0
 fre duration
 ta duration if ever_relationship==1
 ta duration if ever_relationship==0
+ta duration if ever_relationship==.
 
 
 
@@ -328,9 +331,9 @@ save "$TEMP\relspell.dta", replace
 use "$TEMP\relspell.dta", clear
 
 
-* Define some globals 
-global startcm 577  // start date of the earliest time observed (see minbegincm above)
-global expansion 103 // whole observation period of the sample (see dis  maxendcm -  minbegincm   // 210  above (I made 211 just to be sure))
+* Define some globals - these are taken from the education spell data, to make them comparable
+global startcm 469 
+global expansion 211 
 
 
 * identify the first spell of each individual (tag =1 ) 
@@ -566,13 +569,34 @@ destring spell_rel, ignore(".") replace
 recode spell_rel (0 = 0 "Single") ///
 (1 = 1 "Rel: nat-origin") (2 = 2 "Rel: mig-origin") ///
 (13 31 = 3 "Cohab: nat-origin") (23 32 = 4 "Cohab: mig-origin") ///
-(4 = 5 "Missing") (3=6 "Cohab: unclear"), gen(spell_relationship)
+(4 = 5 "Missing") (3=7 "Cohab: unclear"), ///
+gen(spell_relationship) label(spell_rel)
 
 ta spell_relationship
 
 *keep youthid begincm endcm spell_relationship
 
 
+
+* REASSIGNING SOME VALUES TO MISSING (BECAUSE PRE-2011 OR PRE-FIRST SPELL)
+********************************************************************************
+
+format %tm begincm
+
+* Replacing pre-2011 for those who report never having a relationship before then
+replace spell_relationship = 6 if ever_relationship==0 & begincm< ym(2011,1)
+
+* Replacing events before first non-single spell for all other individuals
+bysort youthid (begincm): gen change = sum(spell_rel!= spell_rel[_n-1])
+gen frst_year = begincm if change==2
+bysort youthid: egen cmFrstSpell = min(frst_year)
+replace spell_relationship = 6 if begincm < cmFrstSpell
+
+
+label define spell_rel 6 "Missing/single", modify
+label values spell_relationship spell_rel
+
+ta spell_relationship
 
 * SWITCHING TO AGE-BASED FORMAT
 ********************************************************************************
