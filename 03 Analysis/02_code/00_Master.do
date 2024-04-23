@@ -28,7 +28,8 @@ set linesize 255
 ************* 1. Definition of Globals *********************************
 ************************************************************************
 
-global researcher "Maria"
+*global researcher "Maria"
+global researcher "Alessandro"
 
 
 
@@ -86,5 +87,5 @@ net install convertCMC, from(https://raw.githubusercontent.com/bugbunny/convertC
 *-------------+---------------------------------------------------------
 
 
- do "$DO/01_to_panel_education.do"	
+* do "$DO/01_to_panel_education.do"	
 
