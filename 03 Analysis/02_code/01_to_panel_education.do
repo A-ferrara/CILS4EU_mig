@@ -520,7 +520,7 @@ use "$TEMP\educ.dta", clear
 // https://www.calculator.net/age-calculator.html
 
 
-forval year = 2004/2009 {
+forval year = 2004/2012 {
     gen nov_`year' = ym(`year',11)
 }
 
@@ -530,24 +530,26 @@ forval year = 2004/2009 {
 
 
 gen start = .
-replace start = nov_2004 if birthyr == 1992  & birthmonth <= 6 
-replace start = nov_2005 if birthyr == 1992  & birthmonth > 6
+replace start = nov_2006 if birthyr == 1992  & birthmonth <= 6 
+replace start = nov_2007 if birthyr == 1992  & birthmonth > 6
 
-replace start = nov_2005 if birthyr == 1993  & birthmonth <= 6 
-replace start = nov_2006 if birthyr == 1993  & birthmonth > 6
+replace start = nov_2007 if birthyr == 1993  & birthmonth <= 6 
+replace start = nov_2008 if birthyr == 1993  & birthmonth > 6
 
-replace start = nov_2006 if birthyr == 1994  & birthmonth <= 6 
-replace start = nov_2007 if birthyr == 1994  & birthmonth > 6
+replace start = nov_2008 if birthyr == 1994  & birthmonth <= 6 
+replace start = nov_2009 if birthyr == 1994  & birthmonth > 6
 
-replace start = nov_2007 if birthyr == 1995  & birthmonth <= 6 
-replace start = nov_2008 if birthyr == 1995  & birthmonth > 6
+replace start = nov_2009 if birthyr == 1995  & birthmonth <= 6 
+replace start = nov_2010 if birthyr == 1995  & birthmonth > 6
 
-replace start = nov_2008 if birthyr == 1996  & birthmonth <= 6 
-replace start = nov_2009 if birthyr == 1996  & birthmonth > 6
+replace start = nov_2010 if birthyr == 1996  & birthmonth <= 6 
+replace start = nov_2011 if birthyr == 1996  & birthmonth > 6
 
-replace start = nov_2009 if birthyr == 1997  & birthmonth <= 6
-replace start = nov_2009 if birthyr == 1997  & birthmonth > 6
+replace start = nov_2011 if birthyr == 1997  & birthmonth <= 6
+replace start = nov_2012 if birthyr == 1997  & birthmonth > 6
 
+tab age if start == begincm, miss
+label variable start "Grade-specific (age before Nov) start of trajectory"
 
 
 br youthid begincm endcm nov_* start birthyr birthmonth age 
@@ -559,7 +561,10 @@ tab age if start == begincm
 histogram age if start == begincm
 
 
-forval year = 2012/2020{
+
+* Generating the end date
+
+forval year = 2013/2020 {
     gen nov_`year' = ym(`year',11)
 }
 
@@ -567,24 +572,29 @@ forval year = 2012/2020{
 
 
 * Set the end date of each individual as well (november again)  (WHAT AGE?? )
+
+
 gen end = .
-replace end = nov_2012 if birthyr == 1992  & birthmonth <= 6 
-replace end = nov_2013 if birthyr == 1992  & birthmonth > 6
+replace end = nov_2011 if birthyr == 1992  & birthmonth <= 6 
+replace end = nov_2012 if birthyr == 1992  & birthmonth > 6
 
-replace end = nov_2013 if birthyr == 1993  & birthmonth <= 6 
-replace end = nov_2014 if birthyr == 1993  & birthmonth > 6
+replace end = nov_2012 if birthyr == 1993  & birthmonth <= 6 
+replace end = nov_2013 if birthyr == 1993  & birthmonth > 6
 
-replace end = nov_2014 if birthyr == 1994  & birthmonth <= 6 
-replace end = nov_2015 if birthyr == 1994  & birthmonth > 6
+replace end = nov_2013 if birthyr == 1994  & birthmonth <= 6 
+replace end = nov_2014 if birthyr == 1994  & birthmonth > 6
 
-replace end = nov_2015 if birthyr == 1995  & birthmonth <= 6 
-replace end = nov_2016 if birthyr == 1995  & birthmonth > 6
+replace end = nov_2014 if birthyr == 1995  & birthmonth <= 6 
+replace end = nov_2015 if birthyr == 1995  & birthmonth > 6
 
-replace end = nov_2016 if birthyr == 1996  & birthmonth <= 6 
-replace end = nov_2017 if birthyr == 1996  & birthmonth > 6
+replace end = nov_2015 if birthyr == 1996  & birthmonth <= 6 
+replace end = nov_2016 if birthyr == 1996  & birthmonth > 6
 
-replace end = nov_2017 if birthyr == 1997  & birthmonth <= 6
-replace end = nov_2018 if birthyr == 1997  & birthmonth > 6
+replace end = nov_2016 if birthyr == 1997  & birthmonth <= 6
+replace end = nov_2017 if birthyr == 1997  & birthmonth > 6
+
+label variable end "Grade-specific (age before Nov) end of trajectory"
+tab age if end == begincm, miss
 
 
 tab age if end == begincm
@@ -598,8 +608,8 @@ histogram age if end == begincm
 bysort youthid: drop if begincm < start
 
 
-* Drop observations after the start date 
-bysort youthid: drop if begincm > end
+* Drop observations after the end date 
+*bysort youthid: drop if begincm > end
 
 
 * identify the first observation 
@@ -625,18 +635,17 @@ bysort youthid : gen tag2 = 1  if youthid == youthid[_n+1] & tag1 ==1 & tag1[_n+
 
 * replace begincm 
 sort youthid begincm 
-
-
 br youthid begincm endcm tag1 tag2 missing_start start 
 
 
-
+* adjust begincm for the missing information 
 forvalues i = 1/150 {
     replace begincm = begincm[_n+`i'] -`i' if begincm[_n+`i'] != . & tag1 == tag1[_n+`i'] & youthid == youthid[_n+`i'] & tag2[_n+`i'] == 1 
 }
 
 
 br youthid begincm endcm tag1 tag2 missing_start start  if youthid == 20020204
+br youthid begincm endcm tag1 tag2 missing_start start 
 
 
 replace endcm = begincm +1 if begincm!=. 
@@ -650,17 +659,35 @@ egen max_endcm = max(begincm), by(youthid)
 * tag the last observation 
 bysort youthid : gen tag3 = 1 if (_n == _N)
 
-* calculate the number of rows missing (until start)
-gen missing_end =   end  - max_endcm    if tag3 == 1 
+* calculate the number of rows missing (until end)
+gen missing_end =   end - max_endcm    if tag3 == 1 
 
+
+* recode to missing (if we have much longer information than we actually would like to have)
+replace missing_end = . if    missing_end <0 
+
+
+
+fre missing_end if tag3==1 
+
+br if missing_end==. & tag3==1 
 
 * expand the number of rows missing in the end
 expand missing_end
 sort youthid begincm 
 
+* check for each birth cohort the ascribed end date and the actual end date 
+bysort birthyr: tab max_endcm end, m
+
+
+
+
+
+
+
 br youthid begincm endcm tag1 tag2 tag3  missing_* start end
 
-
+* adjust begincm for the missing information 
 replace begincm = begincm[_n-1] + 1 if begincm[_n-1]!= . & tag3 == tag3[_n-1] & youthid == youthid[_n-1] & tag3 ==1 
 replace endcm = begincm +1 if begincm!=. 
 
@@ -669,8 +696,23 @@ bysort youthid : gen tag4 = 1  if youthid == youthid[_n-1] & tag3 ==1 & tag3[_n-
 
 
 
-* Rerun all the information on age, month, etc
+* double-check if the expansion worked
+sort youthid begincm 
+egen max_endcm_new = max(begincm), by(youthid)
+tab end birthyr, m
+bysort birthyr: tab max_endcm max_endcm_new, m
 
+
+
+
+
+** until here: check why there are still some missing observations at the end??
+
+
+
+
+
+* Redo the variable on age, month, etc
 capture drop  date month yr age_year age_month  age agecm 
 
 
@@ -728,7 +770,7 @@ egen spell_edu = rowmax(spell_edu1 - spell_edu17)
 egen spell_N = rownonmiss(spell_edu1 - spell_edu17)
 
 
-
+* check if any variable is equal to any integer value
 egen spell_edu_test = anymatch(spell_edu1 - spell_edu17), values(4)
 
 
@@ -739,7 +781,6 @@ egen spell_edu_test = anymatch(spell_edu1 - spell_edu17), values(4)
 /*
 
 *** Priority of spells:
-
 4- Tertiary
 3- Upper secondary
 2- Intermediate secondary 
@@ -748,7 +789,6 @@ egen spell_edu_test = anymatch(spell_edu1 - spell_edu17), values(4)
 6- Apprenticeship
 7- employment
 8- out of employment 
-
 */ 
 
 cap drop edu_spell
@@ -816,43 +856,126 @@ replace missing = 1 if  spell_edu == 9
 
 
 
-** Overall missing patterns by century months 
-quietly tab  begincm missing , matcell(table)  matrow(names)  m
-putexcel set "$DESC\Missingpattern", modify sheet("Overall missing") 
+
+* Change the time frame to grademonth (time focuses now on the grade and not on the cmonth)
+
+sort youthid begincm
+egen grade_month = seq(), from(1) by (youthid)
+
+label variable grade_month "Months starting from November in Grade 9"
+
+** grademonth= 1 is equivalent to November of the year, in which the pupil turned 14 until the end of June 
+tab age if grade_month==1
+
+/*
+
+        age |      Freq.     Percent        Cum.
+------------+-----------------------------------
+   14.41667 |        393        7.82        7.82
+       14.5 |        445        8.85       16.67
+   14.58333 |        369        7.34       24.01
+   14.66667 |        432        8.59       32.60
+      14.75 |        381        7.58       40.18
+   14.83333 |        423        8.41       48.59
+   14.91667 |        426        8.47       57.06
+         15 |        388        7.72       64.78
+   15.08333 |        428        8.51       73.29
+   15.16667 |        442        8.79       82.08
+      15.25 |        436        8.67       90.75
+   15.33333 |        465        9.25      100.00
+------------+-----------------------------------
+      Total |      5,028      100.00
+
+*/ 
+
+*  Generate a sequence of numbers for every second row
+egen grade_bimonth = seq(), block(2) by (youthid)
+by youthid: replace grade_bimonth = . if grade_bimonth[_n-1]== grade_bimonth
+
+
+label variable grade_bimonth "Every second months starting from November in Grade 9"
+
+
+
+egen grade= seq(), block(12) by (youthid)
+replace grade= grade+8
+* note: this would assume that the school years starts in November which it doesn't really, but the start of the school year is around August/September (depending on the year and the state)
+
+
+* make sure to have spell_edu information on every second month 
+
+
+save "$TEMP\educ2.dta", replace 
+use "$TEMP\educ2.dta", clear
+
+fre spell_edu
+
+clonevar educationalspell = spell_edu
+
+bysort youthid begincm: replace spell_edu =  spell_edu[_n+1] if spell_edu == 9 & spell_edu[_n+1]!= 9 & grade_bimonth!=. & _n>1
+replace spell_edu = spell_edu[_n+1] if spell_edu==. 
+br youthid spell_edu *grade* educational* 
+br youthid spell_edu *grade* educational* if educationalspell != spell_edu 
+br youthid spell_edu *grade* educational*   if youthid==20090113
+count if educationalspell != spell_edu 
+
+
+*drop every second row 
+
+drop if grade_bimonth ==. 
+
+
+
+* Some descriptive statistics 
+tab   grade_bimonth  spell_edu , matcell(table)  matrow(names)  m
+putexcel set "$DESC\Educationalspells", modify sheet("Overall") 
 putexcel B1 = matrix(table), names hcenter
 putexcel B2 = matrix(names)
 
-putexcel B1 = "Centurymonth"
-putexcel C1 = "Non-missing observations"
-putexcel D1 = "Missing observations"
+putexcel B1 = "Bimonthly"
+putexcel C1 = "Lower secondary"
+putexcel D1 = "Intermediate secondary "
+putexcel E1 = "Upper secondary"
+putexcel F1 = "Tertiary"
+putexcel G1 = "Other"
+putexcel H1 = "Apprenticeship"
+putexcel I1 = "Employment"
+putexcel J1 = "Out of employment "
+putexcel K1 = "Missing"
+putexcel L1 = "SUM"
 
-putexcel E1 = "SUM"
-putexcel F1 = "Percentage Non-missing"
 
-forvalues j = 2/170 {
-    putexcel E`j' = formula(=SUM(C`j':D`j'))
-    putexcel F`j' = formula(=C`j'/E`j')
+putexcel M1 = "Percentages"
+putexcel N1 = "Lower secondary"
+putexcel O1 = "Intermediate secondary "
+putexcel P1 = "Upper secondary"
+putexcel Q1 = "Tertiary"
+putexcel R1 = "Other"
+putexcel S1 = "Apprenticeship"
+putexcel T1 = "Employment"
+putexcel U1 = "Out of employment "
+putexcel V1 = "Missing"
+putexcel W1 = "SUM"
+putexcel X1 = "Missing of max observations"
+putexcel Z1 = "Max observations"
 
+forvalues j = 2/34 {
+    putexcel L`j' = formula(=SUM(C`j':K`j'))
+	putexcel N`j' = formula(=C`j'/L`j')
+	putexcel O`j' = formula(=D`j'/L`j')
+    putexcel P`j' = formula(=E`j'/L`j')
+    putexcel Q`j' = formula(=F`j'/L`j')
+    putexcel R`j' = formula(=G`j'/L`j')
+    putexcel S`j' = formula(=H`j'/L`j')
+    putexcel T`j' = formula(=I`j'/L`j')
+    putexcel U`j' = formula(=J`j'/L`j')
+    putexcel V`j' = formula(=K`j'/L`j')
+    putexcel W`j' = formula(=SUM(N`j':V`j'))
+	putexcel Z2   = formula(=MAX(L2:L32)) 
+	putexcel X`j' = formula(=L`j'/Z2)
 }
 
 
-* Set a months and a year variable to get an idea what is meant by the cm variable 
-local start_begincm 538
-local end_begincm 705
-
-local row_index 2
-
-forvalues begincm = `start_begincm'/`end_begincm' {
-    quietly tab month if begincm == `begincm', matrow(names)
-    matlist names
-    putexcel H`row_index' = matrix(names)
-
-    quietly tab yr if begincm == `begincm', matrow(names)
-    matlist names
-    putexcel I`row_index' = matrix(names)
-    
-    local row_index = `row_index' + 1
-}
 
 
 ** Missing patterns by birth cohorts and century months  
@@ -863,101 +986,80 @@ local years "1992 1994 1995 1996 1997 1998 "
 
 foreach year in `years' {
     * Tabulate missing data by birth year
-    quietly tab begincm missing if birthyr == `year', matcell(missing_table) matrow(missing_names) m
-    putexcel set "$DESC\Missingpattern_education", modify sheet("Birthyr`year'")
-    putexcel B1 = matrix(missing_table), names 
-    putexcel B2 = matrix(missing_names)
-    putexcel B1 = "Centurymonth"
-    putexcel C1 = "Non-missing observations"
-    putexcel D1 = "Missing observations"
-    putexcel E1 = "SUM"
-    putexcel F1 = "Percentage Non-missing"
-
-
-forvalues j = 2/120 {
-    putexcel E`j' = formula(=SUM(C`j':D`j'))
-    putexcel F`j' = formula(=C`j'/E`j')
- 
-
-    * Tabulate age data by birth year
-    quietly tab begincm age_year if birthyr == `year', matcell(age_table) matrow(age_names) m
-    putexcel set "$DESC\Missingpattern_education", modify sheet("Birthyr`year'")
-    putexcel G1 = matrix(age_table), names 
-    putexcel G2 = matrix(age_names)
-    putexcel G1 = "Centurymonth"
+    quietly tab   grade_bimonth  spell_edu if birthyr == `year',  matcell(table)  matrow(names)  m
+    putexcel set "$DESC\Educationalspells", modify sheet("Birthyr`year'")
+	putexcel B1 = matrix(table), names hcenter
+    putexcel B2 = matrix(names)
 	
-    * Write column labels to Excel
-    putexcel H1 = "Age (in years) 12"
-    putexcel I1 = "13"
-    putexcel J1 = "14"
-    putexcel K1 = "15"
-    putexcel L1 = "16"
-    putexcel M1 = "17"
-    putexcel N1 = "18"
-    putexcel O1 = "19"
-    putexcel P1 = "20"
-    putexcel Q1 = "21"	
-	   }
+	putexcel B1 = "Bimonthly"
+	putexcel C1 = "Lower secondary"
+	putexcel D1 = "Intermediate secondary "
+	putexcel E1 = "Upper secondary"
+	putexcel F1 = "Tertiary"
+	putexcel G1 = "Other"
+	putexcel H1 = "Apprenticeship"
+	putexcel I1 = "Employment"
+	putexcel J1 = "Out of employment "
+	putexcel K1 = "Missing"
+	putexcel L1 = "SUM"
 
-	   
-forvalues j = 2/120 {
-    putexcel G`j' = formula(= B`j') 
+
+	putexcel M1 = "Percentages"
+	putexcel N1 = "Lower secondary"
+	putexcel O1 = "Intermediate secondary "
+	putexcel P1 = "Upper secondary"
+	putexcel Q1 = "Tertiary"
+	putexcel R1 = "Other"
+	putexcel S1 = "Apprenticeship"
+	putexcel T1 = "Employment"
+	putexcel U1 = "Out of employment "
+	putexcel V1 = "Missing"
+	putexcel W1 = "SUM"
+	putexcel X1 = "Missing of max observations"
+	putexcel Z1 = "Max observations"
+
+forvalues j = 2/32 {
+    putexcel L`j' = formula(=SUM(C`j':K`j'))
+	putexcel N`j' = formula(=C`j'/L`j')
+	putexcel O`j' = formula(=D`j'/L`j')
+    putexcel P`j' = formula(=E`j'/L`j')
+    putexcel Q`j' = formula(=F`j'/L`j')
+    putexcel R`j' = formula(=G`j'/L`j')
+    putexcel S`j' = formula(=H`j'/L`j')
+    putexcel T`j' = formula(=I`j'/L`j')
+    putexcel U`j' = formula(=J`j'/L`j')
+    putexcel V`j' = formula(=K`j'/L`j')
+    putexcel W`j' = formula(=SUM(N`j':V`j'))
+	putexcel Z2   = formula(=MAX(L2:L32)) 
+	putexcel X`j' = formula(=L`j'/Z2)
 }
-}
 
-
-
-local months "nov_2004 nov_2005 nov_2006 nov_2007 nov_2008 nov_2009"
-
-foreach month in `months' {
-    * Tabulate missing data by month
-    tab begincm missing if `month' == min_begincm, matcell(missing_table) matrow(missing_names) m
-    putexcel set "$DESC\Missingpattern_education", modify sheet("`month'")
-    putexcel B1 = matrix(missing_table), names 
-    putexcel B2 = matrix(missing_names)
-    putexcel B1 = "Centurymonth"
-    putexcel C1 = "Non-missing observations"
-    putexcel D1 = "Missing observations"
-    putexcel E1 = "SUM"
-    putexcel F1 = "Percentage Non-missing"
-	
-
-	
-forvalues j = 2/120 {
-    putexcel E`j' = formula(=SUM(C`j':D`j'))
-    putexcel F`j' = formula(=C`j'/E`j')
- 
-
-    * Tabulate age data by birth year
-    quietly tab begincm age_year if `month' == min_begincm, matcell(age_table) matrow(age_names) m
-    putexcel set "$DESC\Missingpattern_education", modify sheet("`month'")
-    putexcel G1 = matrix(age_table), names 
-    putexcel G2 = matrix(age_names)
-    putexcel G1 = "Centurymonth"
-	
-    * Write column labels to Excel
-    putexcel H1 = "Age (in years) 12"
-    putexcel I1 = "13"
-    putexcel J1 = "14"
-    putexcel K1 = "15"
-    putexcel L1 = "16"
-    putexcel M1 = "17"
-    putexcel N1 = "18"
-    putexcel O1 = "19"
-    putexcel P1 = "20"
-    putexcel Q1 = "21"	
-	   }
-
-	   
-forvalues j = 2/120 {
-    putexcel G`j' = formula(= B`j') 
-}
 }
 
 
-* 
-sort youthid begincm 
-br youthid begincm spell_edu age*  min_begincm 
+
+
+egen maxgrade_bimonth  =max(grade_bimonth), by (youthid)
+fre maxgrade_bimonth
+
+br youthid begincm spell_edu age* yr *grade* if maxgrade_bimonth < 29 & birthyr == 1994
+
+tab age if birthyr == 1994
+
+sum age if grade_bimonth ==1 , det 
+sum age if grade_bimonth ==30 , det 
+
+
+
+* do this for each cohort 
+
+
+tab   grade_bimonth  grade , matcell(table)  matrow(names)  m
+
+tab   grade_bimonth  grade , matcell(table)  matrow(names)  m
+
+
+tab spell_edu if grade_bimonth==1 , sort  
 
 
 

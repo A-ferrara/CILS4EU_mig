@@ -28,8 +28,8 @@ set linesize 255
 ************* 1. Definition of Globals *********************************
 ************************************************************************
 
-*global researcher "Maria"
-global researcher "Alessandro"
+global researcher "Maria"
+*global researcher "Alessandro"
 
 
 
