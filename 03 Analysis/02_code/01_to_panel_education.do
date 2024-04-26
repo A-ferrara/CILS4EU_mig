@@ -1182,7 +1182,6 @@ tab spell_edu if grade_bimonth==1 , sort
 **# Bookmark 10. Investigate time series data   *************************
 ************************************************************************
 
-
 * Declare data to be time series 
 tsset youthid begincm 
 tsspell spell_edu
