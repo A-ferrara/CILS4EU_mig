@@ -319,7 +319,7 @@ order ${pid} ${begin} ${end} ${spellnr} ${spelltype}
  
 save "$TEMP\spelldata.dta", replace 
 
-
+use "$TEMP\spelldata.dta", clear 
 
 ************************************************************************
 **# Bookmark 5.  Panel data preparation  *******************************
@@ -329,6 +329,11 @@ save "$TEMP\spelldata.dta", replace
 
 * Dataset  education and profession 
 use "$DATA/w6_ylhcs_ge_v6.0.0_rv.dta", clear
+
+*  add year of birth from the other dataset 
+merge m:1 youthid using "$DATA/w6_ym_ge_v6.0.0_rv.dta" , keepusing (y6_doby y6_dobm  y6_sex) keep (match)
+
+
 
 
 * Define some globals 
@@ -341,7 +346,7 @@ bys ${pid}(y6_ylhcs_index): gen tag= _n ==1
 
 * keep only one row for each individual
 keep if tag ==1 
-keep ${pid} 
+keep ${pid}  *dob* 
 unique(${pid})
 expand ${expansion}    
 sort ${pid} 
@@ -368,6 +373,9 @@ save "$TEMP\paneldata.dta", replace
 use "$TEMP\spelldata.dta", clear  
 
 
+
+
+
 ** Generate a variable indicating the educational/spelltype status for each index/spell (in this case total 17 = (max)y6_ylhcs_index))
 * generate a variable for each possible value of ${spelltype}  (22 values)
 forvalues i = 1(1)17 {
@@ -383,7 +391,7 @@ save "$TEMP\spelldata_short.dta", replace
 forvalues i = 1(1)17 {
 	use "$TEMP\spelldata_short.dta", clear  
 	keep if index==`i'
-	keep youthid begincm endcm birthcm index  spell_edu`i'		 // add here any variables you'd want to keep from the spelldataset 
+	keep youthid begincm endcm birthcm index spell_edu`i'		 // add here any variables you'd want to keep from the spelldataset 
 	clonevar index`i' =  index
 	drop index
 	save "$TEMP\spelldata_`i'.dta", replace
@@ -393,15 +401,24 @@ forvalues i = 1(1)17 {
 
 use  "$TEMP\paneldata.dta", clear 
 
+duplicates report  ${pid}  
+duplicates list youthid begincm 
+
+
+
 * merge each separate spell dataset to the 'blanco' dataset created above
 forvalues i = 1(1)17 {
-merge 1:1 ${pid} ${begin}  using "$TEMP\spelldata_`i'.dta", gen(mergepanel`i')
+merge 1:1 ${pid} ${begin} using "$TEMP\spelldata_`i'.dta", gen(mergepanel`i')
 display `i'
 }
 
 
+
+
+
+
 order ${pid}  ${begin}  ${end} spell_edu* merge* 
-br
+
 br if  ${begin}  ==. 
 
 
@@ -417,7 +434,18 @@ drop index* mergepanel*
 
 * make sure to have no duplicates (not several rows with the same starting month)
 unique(${pid}  ${begin})
-duplicates report  ${pid}  
+duplicates report  ${pid}   ${begin}
+
+
+** fill if there are gaps in the time series within a person 
+tsset youthid begincm 
+tsfill 
+* replace end variable (missing due to tsfill)
+replace ${end} = ${begin} + 1 if ${begin}!=. 
+
+
+
+
 
 
 * Add some time variables (for the year and months of spell) 
@@ -435,6 +463,16 @@ gen yr=year(date)
 drop date
 rename dm date 
 format %tm date
+
+
+
+clonevar birthdm     = y6_dobm 
+clonevar birthdy     = y6_doby 
+
+* Year and month of birth in cm  (not sure if this is relevant but more specific than year of birth)
+cap drop birthcm 
+gen birthcm = ym( birthdy, birthdm)
+
 
 
 * Add some time variables (for the year and months of birthday) 
@@ -503,54 +541,107 @@ ta spell_edu1 if frst_age_flag==2 // more likely to be in an apprenticeship
 
 
 
+br if youthid== 22025416
+br if youthid== 22023912
+*based on this youthid, I would drop observations that have no correct start or end date (or both)
+drop if begincm==.  //okay, only 8 observations for educational spells 
+
+
+
 save "$TEMP\educ.dta", replace 
+
+
+
+************************************************************************
+**# Bookmark 7. Adjust the time frame   ********************************
+************************************************************************
+
 use "$TEMP\educ.dta", clear
 
 
-
-************************************************************************
-**# Bookmark 7. Set time frame  ****************************************
-************************************************************************
-
-
-
-
-* Generate cm for all novembers from 2004-2009, 2013-2019
-
+* Generate cm for all novembers from 2004-2012
 // https://www.calculator.net/age-calculator.html
-
-
 forval year = 2004/2012 {
     gen nov_`year' = ym(`year',11)
 }
 
 
 * Set the cm start for each individual depending on when they were born 
-// criteria: They should be 12 until June of the calendar (before entering the school year in september, this is following the logic of )
+// criteria: They should be 14 until June of the calendar (before entering the school year in novemver, this is following the logic of Dollmann & Weißmann 2019)
 
 
 gen start = .
+* Class of 2006 
 replace start = nov_2006 if birthyr == 1992  & birthmonth <= 6 
+
+* Class of 2007
 replace start = nov_2007 if birthyr == 1992  & birthmonth > 6
-
 replace start = nov_2007 if birthyr == 1993  & birthmonth <= 6 
+
+* Class of 2008
 replace start = nov_2008 if birthyr == 1993  & birthmonth > 6
-
 replace start = nov_2008 if birthyr == 1994  & birthmonth <= 6 
+
+* Class of 2009
 replace start = nov_2009 if birthyr == 1994  & birthmonth > 6
-
 replace start = nov_2009 if birthyr == 1995  & birthmonth <= 6 
+
+* Class of 2010
 replace start = nov_2010 if birthyr == 1995  & birthmonth > 6
-
-replace start = nov_2010 if birthyr == 1996  & birthmonth <= 6 
+replace start = nov_2010 if birthyr == 1996  & birthmonth <= 6
+ 
+* Class of 2011
 replace start = nov_2011 if birthyr == 1996  & birthmonth > 6
-
 replace start = nov_2011 if birthyr == 1997  & birthmonth <= 6
+
+* Class of 2012
 replace start = nov_2012 if birthyr == 1997  & birthmonth > 6
 
-tab age if start == begincm, miss
-label variable start "Grade-specific (age before Nov) start of trajectory"
+tab age if start == begincm, m
+label variable start "Grade-specific start of trajectory in cm"
 
+
+** Create the starting year of each individual (based on birthyear and birthmonth)
+gen class = .
+* Class of 2006 
+replace class = 2006 if birthyr == 1992  & birthmonth <= 6 
+
+* Class of 2007
+replace class = 2007 if birthyr == 1992  & birthmonth > 6
+replace class = 2007 if birthyr == 1993  & birthmonth <= 6 
+
+* Class of 2008
+replace class = 2008 if birthyr == 1993  & birthmonth > 6
+replace class = 2008 if birthyr == 1994  & birthmonth <= 6 
+
+* Class of 2009
+replace class = 2009 if birthyr == 1994  & birthmonth > 6
+replace class = 2009 if birthyr == 1995  & birthmonth <= 6 
+
+* Class of 2010
+replace class = 2010 if birthyr == 1995  & birthmonth > 6
+replace class = 2010 if birthyr == 1996  & birthmonth <= 6
+ 
+* Class of 2011
+replace class = 2011 if birthyr == 1996  & birthmonth > 6
+replace class = 2011 if birthyr == 1997  & birthmonth <= 6
+
+* Class of 2012
+replace class = 2012 if birthyr == 1997  & birthmonth > 6
+
+
+label variable start "Class of the specific calendar year"
+
+label define class 2006 "2006 (92)" ///
+                        2007 "2007 (92/93)" ///
+                        2008 "2008 (93/94)" ///
+                        2009 "2009 (94/95)" ///
+                        2010 "2010 (95/96)" ///
+                        2011 "2011 (96/97)" ///
+                        2012 "2012 (97)"
+						
+label values class class			
+						
 
 br youthid begincm endcm nov_* start birthyr birthmonth age 
 br if age >13 & start == begincm
@@ -562,74 +653,25 @@ histogram age if start == begincm
 
 
 
-* Generating the end date
-
-forval year = 2013/2020 {
-    gen nov_`year' = ym(`year',11)
-}
+** Adjust the start date  
 
 
-
-
-* Set the end date of each individual as well (november again)  (WHAT AGE?? )
-
-
-gen end = .
-replace end = nov_2011 if birthyr == 1992  & birthmonth <= 6 
-replace end = nov_2012 if birthyr == 1992  & birthmonth > 6
-
-replace end = nov_2012 if birthyr == 1993  & birthmonth <= 6 
-replace end = nov_2013 if birthyr == 1993  & birthmonth > 6
-
-replace end = nov_2013 if birthyr == 1994  & birthmonth <= 6 
-replace end = nov_2014 if birthyr == 1994  & birthmonth > 6
-
-replace end = nov_2014 if birthyr == 1995  & birthmonth <= 6 
-replace end = nov_2015 if birthyr == 1995  & birthmonth > 6
-
-replace end = nov_2015 if birthyr == 1996  & birthmonth <= 6 
-replace end = nov_2016 if birthyr == 1996  & birthmonth > 6
-
-replace end = nov_2016 if birthyr == 1997  & birthmonth <= 6
-replace end = nov_2017 if birthyr == 1997  & birthmonth > 6
-
-label variable end "Grade-specific (age before Nov) end of trajectory"
-tab age if end == begincm, miss
-
-
-tab age if end == begincm
-histogram age if end == begincm
-
-
-** create one spell for each individual, if overlapping give preference to educational spells
-// There is a bit of an age range since we check the age until June and then start in November 
-
-* Drop observations before the start date
-bysort youthid: drop if begincm < start
-
-
-* Drop observations after the end date 
-*bysort youthid: drop if begincm > end
-
-
-* identify the first observation 
+* identify the first observation in cm 
 egen min_begincm = min(begincm), by(youthid)
 
-
+* tag the first observation 
 bysort youthid: gen tag1 = 1 if _n==1
 
 * calculate the number of rows missing (until start)
-gen missing_start =   min_begincm+1 - start   if tag1 == 1 
-
-
-
-
+gen missing_start =   min_begincm +1 - start   if tag1 == 1 
 
 * expand the number of rows missing in the beginning 
 expand missing_start 
 sort youthid begincm 
 
 br if youthid == 20020204
+
+* tag the first observation (again)
 bysort youthid : gen tag2 = 1  if youthid == youthid[_n+1] & tag1 ==1 & tag1[_n+1] ==.
 
 
@@ -646,73 +688,88 @@ forvalues i = 1/150 {
 
 br youthid begincm endcm tag1 tag2 missing_start start  if youthid == 20020204
 br youthid begincm endcm tag1 tag2 missing_start start 
-
+br if youthid == 22018309
 
 replace endcm = begincm +1 if begincm!=. 
 
 
 
+** check whether we generally have earlier observations or not // --> this is relevant for the relationship as well!! 
+bysort class: tab missing_start
 
-* identify the last observation in cm 
-egen max_endcm = max(begincm), by(youthid)
+
+** Adjust the end date  
+
+* Create a specific end date for each class (latest observation by class)
+egen class_end  = max(begincm), by(class)
+sort youthid begincm 
+
+* create an individual-specific end date 
+sort youthid begincm 
+egen ind_end = max(begincm), by(youthid)
 
 * tag the last observation 
 bysort youthid : gen tag3 = 1 if (_n == _N)
 
-* calculate the number of rows missing (until end)
-gen missing_end =   end - max_endcm    if tag3 == 1 
+
+* check for each class the ascribed end date and the actual end date 
+tab class_end class, m  //maximum end of this class 
+tab ind_end class, m  //end of each individual 
 
 
-* recode to missing (if we have much longer information than we actually would like to have)
-replace missing_end = . if    missing_end <0 
+* calculate the number of rows missing (until class_end )
+gen missing_end =  class_end+1 - ind_end  if tag3 == 1 
 
 
+br if youthid == 20080215
+br if youthid == 20040116
 
 fre missing_end if tag3==1 
 
-br if missing_end==. & tag3==1 
+
 
 * expand the number of rows missing in the end
+sort youthid begincm 
 expand missing_end
 sort youthid begincm 
 
-* check for each birth cohort the ascribed end date and the actual end date 
-bysort birthyr: tab max_endcm end, m
-
-
-
-
-
-
-
 br youthid begincm endcm tag1 tag2 tag3  missing_* start end
+sort youthid begincm 
+
 
 * adjust begincm for the missing information 
-replace begincm = begincm[_n-1] + 1 if begincm[_n-1]!= . & tag3 == tag3[_n-1] & youthid == youthid[_n-1] & tag3 ==1 
+replace begincm = begincm[_n-1] + 1 if begincm[_n-1]!= .  & youthid == youthid[_n-1] & tag3 ==1 
 replace endcm = begincm +1 if begincm!=. 
 
-
+* identify the last existing observation (before the imputed observations start)
 bysort youthid : gen tag4 = 1  if youthid == youthid[_n-1] & tag3 ==1 & tag3[_n-1] ==.
 
 
 
+br if youthid == 22023912
+br if youthid== 22025416
+
 * double-check if the expansion worked
+sort youthid begincm  
+egen ind_end_new = max(begincm), by(youthid)
+
+
+
+br
+
 sort youthid begincm 
-egen max_endcm_new = max(begincm), by(youthid)
-tab end birthyr, m
-bysort birthyr: tab max_endcm max_endcm_new, m
-
-
-
-
 
 ** until here: check why there are still some missing observations at the end??
+** why does this differ between individuals??? 
+** shouldn't it be replaced so that it is the same for everyone? why are some observations decreasing? 
+** 
+
+br if missing_end!=.
+br if youthid == 20080215
 
 
 
-
-
-* Redo the variable on age, month, etc
+** Redo the variable on age, month, etc
 capture drop  date month yr age_year age_month  age agecm 
 
 
@@ -752,7 +809,11 @@ gen age_year = age - dismonth
 
 br youthid begincm endcm tag1 tag2 missing_start start yr month date age_year  if youthid == 20020204
 
-* Check the spelltype variable
+
+
+************************************************************************
+**# Bookmark 8. Revise the spelltype variable   ************************
+************************************************************************
 
 
 
@@ -830,18 +891,18 @@ foreach var of global spell_edu_vars {
 
 sort youthid begincm
 
-* replace the gap fillers (until start and end date) with missing (are filled right now because of the expand code)
+* replace the gap fillers (until start and end date) with missing (are filled right now because of the expand code); very important!!!! 
 replace spell_edu = 9 if tag3==1 & tag4!=1 
 replace spell_edu = 9 if tag1==1 & tag2!=1 
+
+
+* set spell_edu to missing (previous gaps in the dataset, see e.g.  youthid== 22025416 )
+replace spell_edu = 9  if spell_edu ==. 
+
 
 label define spell_edu 1 "Lower secondary" 2 "Intermediate secondary" 3 "Upper secondary" 4 "Tertiary" 5 "Other" 6 "Apprenticeship" 7 "Employment" 8 "Out of employment" 9 "Missing ", modify 
 label values spell_edu spell_edu 
 
-
-
-br youthid begincm endcm *spell_*  if spell_N>1 
-
-br youthid begincm endcm spell_edu 
 
 
 
@@ -857,10 +918,30 @@ replace missing = 1 if  spell_edu == 9
 
 
 
+************************************************************************
+**# Bookmark 9. Set the time frame   ***********************************
+************************************************************************
+
+
+* Drop all observations before the start date we have now (around age 14)
+bysort class: count if begincm < start 
+
+* Keep only observations after the official start date 
+br if youthid == 22018309
+
+
+drop if start==. 
+drop if begincm < start  
+/// (208,084 observations deleted)
+
+
+
 * Change the time frame to grademonth (time focuses now on the grade and not on the cmonth)
 
 sort youthid begincm
-egen grade_month = seq(), from(1) by (youthid)
+egen grade_month = seq() if start == begincm , from(1) by (youthid)
+
+** if command: there are some individuals who start after the "official start date"
 
 label variable grade_month "Months starting from November in Grade 9"
 
@@ -869,30 +950,32 @@ tab age if grade_month==1
 
 /*
 
+
         age |      Freq.     Percent        Cum.
 ------------+-----------------------------------
-   14.41667 |        393        7.82        7.82
-       14.5 |        445        8.85       16.67
-   14.58333 |        369        7.34       24.01
-   14.66667 |        432        8.59       32.60
-      14.75 |        381        7.58       40.18
-   14.83333 |        423        8.41       48.59
-   14.91667 |        426        8.47       57.06
-         15 |        388        7.72       64.78
-   15.08333 |        428        8.51       73.29
-   15.16667 |        442        8.79       82.08
-      15.25 |        436        8.67       90.75
-   15.33333 |        465        9.25      100.00
+   14.41667 |        400        7.89        7.89
+       14.5 |        447        8.82       16.71
+   14.58333 |        375        7.40       24.10
+   14.66667 |        439        8.66       32.76
+      14.75 |        382        7.53       40.30
+   14.83333 |        427        8.42       48.72
+   14.91667 |        428        8.44       57.16
+         15 |        390        7.69       64.85
+   15.08333 |        431        8.50       73.35
+   15.16667 |        443        8.74       82.09
+      15.25 |        440        8.68       90.77
+   15.33333 |        468        9.23      100.00
 ------------+-----------------------------------
-      Total |      5,028      100.00
+      Total |      5,070      100.00
 
 */ 
+
+
+
 
 *  Generate a sequence of numbers for every second row
 egen grade_bimonth = seq(), block(2) by (youthid)
 by youthid: replace grade_bimonth = . if grade_bimonth[_n-1]== grade_bimonth
-
-
 label variable grade_bimonth "Every second months starting from November in Grade 9"
 
 
@@ -903,6 +986,18 @@ replace grade= grade+8
 
 
 * make sure to have spell_edu information on every second month 
+egen max_grade_bimonth =max(grade_bimonth), by (youthid)
+bysort class: tab max_grade_bimonth
+
+
+br if birthyr == 1994 & max_grade_bimonth< 38 
+br if youthid == 22023912
+
+* in this case: why is begincm missing? (22023912)
+
+sort youthid begincm grade_month 
+
+
 
 
 save "$TEMP\educ2.dta", replace 
@@ -910,25 +1005,36 @@ use "$TEMP\educ2.dta", clear
 
 fre spell_edu
 
-clonevar educationalspell = spell_edu
 
-bysort youthid begincm: replace spell_edu =  spell_edu[_n+1] if spell_edu == 9 & spell_edu[_n+1]!= 9 & grade_bimonth!=. & _n>1
-replace spell_edu = spell_edu[_n+1] if spell_edu==. 
-br youthid spell_edu *grade* educational* 
-br youthid spell_edu *grade* educational* if educationalspell != spell_edu 
-br youthid spell_edu *grade* educational*   if youthid==20090113
-count if educationalspell != spell_edu 
+
+* Calculate the number of month individuals spend in each educational state (gping by priorization)
+
+forvalues j = 1/9 {
+cap drop count_edu`j'
+egen count_edu`j' = total(spell_edu == `j'), by(youthid)
+tab count_edu`j'
+} 
+
+label variable count_edu1 "N months in Lower secondary"
+label variable count_edu2 "N months in Intermediate secondary"
+label variable count_edu3 "N months in Upper secondary"
+label variable count_edu4 "N months in Tertiary"
+label variable count_edu5 "N months in Other"
+label variable count_edu6 "N months in Apprenticeship"
+label variable count_edu7 "N months in Employment"
+label variable count_edu8 "N months in Out of employment"
+label variable count_edu9 "N months in Missing"
+
 
 
 *drop every second row 
-
 drop if grade_bimonth ==. 
 
 
 
 * Some descriptive statistics 
 tab   grade_bimonth  spell_edu , matcell(table)  matrow(names)  m
-putexcel set "$DESC\Educationalspells", modify sheet("Overall") 
+putexcel set "$DESC\Education", modify sheet("Overall") 
 putexcel B1 = matrix(table), names hcenter
 putexcel B2 = matrix(names)
 
@@ -959,7 +1065,7 @@ putexcel W1 = "SUM"
 putexcel X1 = "Missing of max observations"
 putexcel Z1 = "Max observations"
 
-forvalues j = 2/34 {
+forvalues j = 2/100 {
     putexcel L`j' = formula(=SUM(C`j':K`j'))
 	putexcel N`j' = formula(=C`j'/L`j')
 	putexcel O`j' = formula(=D`j'/L`j')
@@ -976,21 +1082,25 @@ forvalues j = 2/34 {
 }
 
 
+ tab   grade_bimonth  spell_edu if class == 2006
 
 
-** Missing patterns by birth cohorts and century months  
+
+** Missing patterns by class and century months  
 
 * 1993 1994 1995 1996 1997 1998
 
-local years "1992 1994 1995 1996 1997 1998 "
+local years  "2006 2007 2008 2009 2010 2011 2012  "
 
 foreach year in `years' {
     * Tabulate missing data by birth year
-    quietly tab   grade_bimonth  spell_edu if birthyr == `year',  matcell(table)  matrow(names)  m
-    putexcel set "$DESC\Educationalspells", modify sheet("Birthyr`year'")
+    quietly tab   grade_bimonth  spell_edu if class == `year',  matcell(table)  matrow(names)  m
+    putexcel set "$DESC\Education", modify sheet("Class`year'")
 	putexcel B1 = matrix(table), names hcenter
     putexcel B2 = matrix(names)
 	
+	putexcel A1  = "Months"
+    putexcel A2  = "1"
 	putexcel B1 = "Bimonthly"
 	putexcel C1 = "Lower secondary"
 	putexcel D1 = "Intermediate secondary "
@@ -1018,8 +1128,9 @@ foreach year in `years' {
 	putexcel X1 = "Missing of max observations"
 	putexcel Z1 = "Max observations"
 
-forvalues j = 2/32 {
-    putexcel L`j' = formula(=SUM(C`j':K`j'))
+forvalues j = 2/50 {
+	putexcel L`j' = formula(=SUM(C`j':K`j'))
+	putexcel L`j' = formula(=SUM(C`j':K`j'))
 	putexcel N`j' = formula(=C`j'/L`j')
 	putexcel O`j' = formula(=D`j'/L`j')
     putexcel P`j' = formula(=E`j'/L`j')
@@ -1032,10 +1143,15 @@ forvalues j = 2/32 {
     putexcel W`j' = formula(=SUM(N`j':V`j'))
 	putexcel Z2   = formula(=MAX(L2:L32)) 
 	putexcel X`j' = formula(=L`j'/Z2)
+	
+forvalues j = 3/50 {	
+	putexcel A`j' = formula(=SUM(A`j-1'+2))	
+}
 }
 
 }
 
+modify 
 
 
 
@@ -1050,10 +1166,6 @@ sum age if grade_bimonth ==1 , det
 sum age if grade_bimonth ==30 , det 
 
 
-
-* do this for each cohort 
-
-
 tab   grade_bimonth  grade , matcell(table)  matrow(names)  m
 
 tab   grade_bimonth  grade , matcell(table)  matrow(names)  m
@@ -1064,29 +1176,10 @@ tab spell_edu if grade_bimonth==1 , sort
 
 
 
-* Calculate the number of month individuals spend in each educational state 
-
-forvalues j = 1/9 {
-cap drop count_edu`j'
-egen count_edu`j' = total(spell_edu == `j'), by(youthid)
-tab count_edu`j'
-} 
-
-label variable count_edu1 "N months in Lower secondary"
-label variable count_edu2 "N months in Intermediate secondary"
-label variable count_edu3 "N months in Upper secondary"
-label variable count_edu4 "N months in Tertiary"
-label variable count_edu5 "N months in Other"
-label variable count_edu6 "N months in Apprenticeship"
-label variable count_edu7 "N months in Employment"
-label variable count_edu8 "N months in Out of employment"
-label variable count_edu9 "N months in Missing"
-
-
 
 
 ************************************************************************
-**# Bookmark 7. Investigate time series data   *************************
+**# Bookmark 10. Investigate time series data   *************************
 ************************************************************************
 
 
@@ -1231,7 +1324,6 @@ bysort  birthyr:  fre  first_eduspell last_eduspell
 
 
 sort youthid begincm 
-
 br youthid begincm date *age* spell_edu _*  count_* cons_* 
 
 
