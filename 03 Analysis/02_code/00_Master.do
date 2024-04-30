@@ -1,3 +1,4 @@
+**# Bookmark #1
 
 ***********************************************************************************************************
 ***********************************************************************************************************
@@ -29,7 +30,6 @@ set linesize 255
 ************************************************************************
 
 global researcher "Maria"
-*global researcher "Alessandro"
 
 
 
@@ -59,6 +59,7 @@ global DO "$WORKDIR\02_code"
 global LOG     "$WORKDIR\03_log" /* hier soll das log-file gespeichert werden */
 global GRAPH "$WORKDIR\04_graphs"
 global DESC "$WORKDIR\05_tables"
+global DESKTOP "C:\Users\hornunma\Desktop"
 
 }
 
@@ -87,5 +88,5 @@ net install convertCMC, from(https://raw.githubusercontent.com/bugbunny/convertC
 *-------------+---------------------------------------------------------
 
 
-* do "$DO/01_to_panel_education.do"	
+ do "$DO/01_to_panel_education.do"	
 

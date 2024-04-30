@@ -1034,7 +1034,7 @@ drop if grade_bimonth ==.
 
 * Some descriptive statistics 
 tab   grade_bimonth  spell_edu , matcell(table)  matrow(names)  m
-putexcel set "$DESC\Education", modify sheet("Overall") 
+putexcel set "$DESKTOP\Education", modify sheet("Overall") 
 putexcel B1 = matrix(table), names hcenter
 putexcel B2 = matrix(names)
 
@@ -1092,10 +1092,12 @@ forvalues j = 2/100 {
 
 local years  "2006 2007 2008 2009 2010 2011 2012  "
 
+
+
 foreach year in `years' {
     * Tabulate missing data by birth year
     quietly tab   grade_bimonth  spell_edu if class == `year',  matcell(table)  matrow(names)  m
-    putexcel set "$DESC\Education", modify sheet("Class`year'")
+    putexcel set "$DESKTOP\Education", modify sheet("Class`year'")
 	putexcel B1 = matrix(table), names hcenter
     putexcel B2 = matrix(names)
 	
@@ -1144,12 +1146,12 @@ forvalues j = 2/50 {
 	putexcel Z2   = formula(=MAX(L2:L32)) 
 	putexcel X`j' = formula(=L`j'/Z2)
 	
-forvalues j = 3/50 {	
-	putexcel A`j' = formula(=SUM(A`j-1'+2))	
+*forvalues j = 3/50 {	
+*	putexcel A`j' = formula(=SUM(A`j-1'+2))	
 }
 }
 
-}
+
 
 modify 
 
@@ -1181,6 +1183,7 @@ tab spell_edu if grade_bimonth==1 , sort
 ************************************************************************
 **# Bookmark 10. Investigate time series data   *************************
 ************************************************************************
+
 
 * Declare data to be time series 
 tsset youthid begincm 
