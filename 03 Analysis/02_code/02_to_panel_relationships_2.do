@@ -253,6 +253,9 @@ Number of records is  8302 (with cohabitation)
 
 
 
+
+
+
 ************************************************************************
 **# Bookmark 3. Globals for spell data preparation   *******************
 ************************************************************************
@@ -439,7 +442,7 @@ ta index
 ************************************************************************
 
 
-** Generate a variable indicating the educational/spelltype status for each index/spell (in this case total 17 = (max)y6_ylhcs_index))
+** Generate a variable indicating the spelltype status for each index/spell (in this case total 17 = (max)y6_ylhcs_index))
 * generate a variable for each possible value of ${spelltype}  (22 values)
 forvalues i = 1(1)13 {
 clonevar spell_rel`i' =  ${spelltype}  if index ==`i'
@@ -586,18 +589,18 @@ format %tm begincm
 * Replacing pre-2011 for those who report never having a relationship before then
 replace spell_relationship = 6 if ever_relationship==0 & begincm< ym(2011,1)
 
-* Replacing events before first non-single spell for all other individuals
+* Replacing events before first non-single spell before 2011 for the rest
 bysort youthid (begincm): gen change = sum(spell_rel!= spell_rel[_n-1])
 gen frst_year = begincm if change==2
 bysort youthid: egen cmFrstSpell = min(frst_year)
-replace spell_relationship = 6 if begincm < cmFrstSpell
+replace spell_relationship = 6 if begincm < cmFrstSpell & begincm <ym(2011,1)
 
 
 label define spell_rel 6 "Missing/single", modify
 label values spell_relationship spell_rel
 
 ta spell_relationship
-
+ta spell_relationship if begincm > ym(2011,1)
 
 save "$TEMP\relationship.dta", replace 
 
@@ -610,35 +613,110 @@ save "$TEMP\relationship.dta", replace
 use "$TEMP\relationship.dta", clear
 
 
-
-* Generating the start date
+* Generate cm for all novembers from 2004-2012
+// https://www.calculator.net/age-calculator.html
 forval year = 2004/2012 {
     gen nov_`year' = ym(`year',11)
 }
 
+
+* Set the cm start for each individual depending on when they were born 
+// criteria: They should be 14 until June of the calendar (before entering the school year in novemver, this is following the logic of Dollmann & Weißmann 2019)
+
+
 gen start = .
+* Class of 2006 
 replace start = nov_2006 if birthyr == 1992  & birthmonth <= 6 
+
+* Class of 2007
 replace start = nov_2007 if birthyr == 1992  & birthmonth > 6
-
 replace start = nov_2007 if birthyr == 1993  & birthmonth <= 6 
+
+* Class of 2008
 replace start = nov_2008 if birthyr == 1993  & birthmonth > 6
-
 replace start = nov_2008 if birthyr == 1994  & birthmonth <= 6 
+
+* Class of 2009
 replace start = nov_2009 if birthyr == 1994  & birthmonth > 6
-
 replace start = nov_2009 if birthyr == 1995  & birthmonth <= 6 
+
+* Class of 2010
 replace start = nov_2010 if birthyr == 1995  & birthmonth > 6
-
-replace start = nov_2010 if birthyr == 1996  & birthmonth <= 6 
+replace start = nov_2010 if birthyr == 1996  & birthmonth <= 6
+ 
+* Class of 2011
 replace start = nov_2011 if birthyr == 1996  & birthmonth > 6
-
 replace start = nov_2011 if birthyr == 1997  & birthmonth <= 6
+
+* Class of 2012
 replace start = nov_2012 if birthyr == 1997  & birthmonth > 6
 
-tab age if start == begincm, miss
+tab age if start == begincm, m
+label variable start "Grade-specific start of trajectory in cm"
 
 
 
+
+** Create the starting year of each individual (based on birthyear and birthmonth)
+gen class = .
+* Class of 2006 
+replace class = 2006 if birthyr == 1992  & birthmonth <= 6 
+
+* Class of 2007
+replace class = 2007 if birthyr == 1992  & birthmonth > 6
+replace class = 2007 if birthyr == 1993  & birthmonth <= 6 
+
+* Class of 2008
+replace class = 2008 if birthyr == 1993  & birthmonth > 6
+replace class = 2008 if birthyr == 1994  & birthmonth <= 6 
+
+* Class of 2009
+replace class = 2009 if birthyr == 1994  & birthmonth > 6
+replace class = 2009 if birthyr == 1995  & birthmonth <= 6 
+
+* Class of 2010
+replace class = 2010 if birthyr == 1995  & birthmonth > 6
+replace class = 2010 if birthyr == 1996  & birthmonth <= 6
+ 
+* Class of 2011
+replace class = 2011 if birthyr == 1996  & birthmonth > 6
+replace class = 2011 if birthyr == 1997  & birthmonth <= 6
+
+* Class of 2012
+replace class = 2012 if birthyr == 1997  & birthmonth > 6
+
+
+label variable start "Class of the specific calendar year"
+
+label define class 2006 "2006 (92)" ///
+                        2007 "2007 (92/93)" ///
+                        2008 "2008 (93/94)" ///
+                        2009 "2009 (94/95)" ///
+                        2010 "2010 (95/96)" ///
+                        2011 "2011 (96/97)" ///
+                        2012 "2012 (97)"
+						
+label values class class			
+						
+						
+						
+						
+* identify the first observation in cm 
+egen min_begincm = min(begincm), by(youthid)
+unique youthid if min_begincm> start						
+						
+						
+* Checking spell type in start date
+ta spell_relationship if begincm==start
+ta spell_relationship if begincm==start & inlist(class, 2009, 2010)					
+ta spell_relationship class if begincm==start, col
+					
+* 						
+			
+			
+			
+			
+			
 
 * Generating the end date
 

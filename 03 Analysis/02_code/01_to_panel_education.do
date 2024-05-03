@@ -658,6 +658,7 @@ histogram age if start == begincm
 
 * identify the first observation in cm 
 egen min_begincm = min(begincm), by(youthid)
+unique youthid if min_begincm> start
 
 * tag the first observation 
 bysort youthid: gen tag1 = 1 if _n==1
