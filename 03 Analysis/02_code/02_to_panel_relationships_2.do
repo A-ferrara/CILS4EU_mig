@@ -716,7 +716,7 @@ ta spell_relationship class if begincm==start, col
 			
 			
 			
-			
+/*			
 
 * Generating the end date
 
@@ -747,7 +747,88 @@ replace end = nov_2017 if birthyr == 1997  & birthmonth > 6
 tab age if end == begincm, miss
 
 
+*/
 
+
+
+
+************************************************************************
+**# Bookmark 9. Set the time frame   ***********************************
+************************************************************************
+
+
+* Drop all observations before the start date we have now (around age 14)
+bysort class: count if begincm < start 
+
+
+drop if start==. 
+drop if begincm < start  
+/// (676,256 observations deleted - this is more bc of how I generated the data)
+
+
+* Change the time frame to grademonth (time focuses now on the grade and not on the cmonth)
+sort youthid begincm
+egen grade_month = seq() , from(1) by (youthid)
+
+** if command: there are some individuals who start after the "official start date"
+
+label variable grade_month "Months starting from November in Grade 9"
+
+** grademonth= 1 is equivalent to November of the year, in which the pupil turned 14 until the end of June 
+tab age if grade_month==1
+
+
+/*
+
+This matches pretty well with the educational spell data
+
+        age |      Freq.     Percent        Cum.
+------------+-----------------------------------
+   14.41667 |        393        7.95        7.95
+       14.5 |        438        8.86       16.82
+   14.58333 |        361        7.31       24.12
+   14.66667 |        432        8.74       32.87
+      14.75 |        374        7.57       40.44
+   14.83333 |        410        8.30       48.74
+   14.91667 |        419        8.48       57.22
+         15 |        378        7.65       64.87
+   15.08333 |        417        8.44       73.30
+   15.16667 |        433        8.76       82.07
+      15.25 |        430        8.70       90.77
+   15.33333 |        456        9.23      100.00
+------------+-----------------------------------
+      Total |      4,941      100.00
+
+
+*/ 
+
+
+
+
+*  Generate a sequence of numbers for every second row
+egen grade_bimonth = seq(), block(2) by (youthid)
+by youthid: replace grade_bimonth = . if grade_bimonth[_n-1]== grade_bimonth
+label variable grade_bimonth "Every second months starting from November in Grade 9"
+
+
+
+egen grade= seq(), block(12) by (youthid)
+replace grade= grade+8
+* note: this would assume that the school years starts in November which it doesn't really, but the start of the school year is around August/September (depending on the year and the state)
+
+
+* make sure to have information on every second month 
+egen max_grade_bimonth =max(grade_bimonth), by (youthid)
+bysort class: tab max_grade_bimonth
+
+* I fill in the bimonths with the minimum (gives priority to singlehood)
+bysort youthid grade_bimonth: egen spell_relat = min(spell_relationship)
+label values spell_relat spell_rel
+fre spell_relat
+fre spell_relationship
+
+save "$TEMP\relationship2.dta", replace 
+use "$TEMP\relationship2.dta", clear
 
 
 
