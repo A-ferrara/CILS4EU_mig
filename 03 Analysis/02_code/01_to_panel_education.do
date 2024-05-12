@@ -14,7 +14,8 @@ di "`date'"
 
 * create log file 
 capture log close _all 
-log using "$LOG\log_01_to_panel_`date'_$researcher.log", replace
+log using "$LOG\log_01_education_`date'_$researcher.log", replace
+
 
 
 ************************************************************************
@@ -1001,8 +1002,7 @@ sort youthid begincm grade_month
 
 
 
-save "$TEMP\educ2.dta", replace 
-use "$TEMP\educ2.dta", clear
+
 
 fre spell_edu
 
@@ -1026,7 +1026,8 @@ label variable count_edu7 "N months in Employment"
 label variable count_edu8 "N months in Out of employment"
 label variable count_edu9 "N months in Missing"
 
-
+save "$TEMP\educ2.dta", replace 
+use "$TEMP\educ2.dta", clear
 
 *drop every second row 
 drop if grade_bimonth ==. 
@@ -1078,7 +1079,7 @@ forvalues j = 2/100 {
     putexcel U`j' = formula(=J`j'/L`j')
     putexcel V`j' = formula(=K`j'/L`j')
     putexcel W`j' = formula(=SUM(N`j':V`j'))
-	putexcel Z2   = formula(=MAX(L2:L32)) 
+	putexcel Z2   = formula(=MAX(L2:L50)) 
 	putexcel X`j' = formula(=L`j'/Z2)
 }
 
@@ -1133,7 +1134,6 @@ foreach year in `years' {
 
 forvalues j = 2/50 {
 	putexcel L`j' = formula(=SUM(C`j':K`j'))
-	putexcel L`j' = formula(=SUM(C`j':K`j'))
 	putexcel N`j' = formula(=C`j'/L`j')
 	putexcel O`j' = formula(=D`j'/L`j')
     putexcel P`j' = formula(=E`j'/L`j')
@@ -1144,17 +1144,14 @@ forvalues j = 2/50 {
     putexcel U`j' = formula(=J`j'/L`j')
     putexcel V`j' = formula(=K`j'/L`j')
     putexcel W`j' = formula(=SUM(N`j':V`j'))
-	putexcel Z2   = formula(=MAX(L2:L32)) 
+	putexcel Z2   = formula(=MAX(L2:L50)) 
 	putexcel X`j' = formula(=L`j'/Z2)
-	
-*forvalues j = 3/50 {	
-*	putexcel A`j' = formula(=SUM(A`j-1'+2))	
+
 }
 }
 
 
 
-modify 
 
 
 
@@ -1184,6 +1181,10 @@ tab spell_edu if grade_bimonth==1 , sort
 ************************************************************************
 **# Bookmark 10. Investigate time series data   *************************
 ************************************************************************
+
+use "$TEMP\educ2.dta", clear
+
+
 
 
 * Declare data to be time series 
@@ -1287,7 +1288,6 @@ label variable cons_edu9 "N conseq months in Missing"
 
 
 * Identify the first and the last spell per individual
-
 by youthid: gen first_eduspell = spell_edu if _spell == 1 
 egen max_first_eduspell  = max(first_eduspell), by(youthid)
 drop first_eduspell
@@ -1331,8 +1331,10 @@ br youthid begincm date *age* spell_edu _*  count_* cons_*
 
 
 	
+*drop every second row 
+drop if grade_bimonth ==. 
 	
-	
+save "$TEMP\educ3.dta", replace 
 	
 	
 	
