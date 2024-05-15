@@ -833,7 +833,7 @@ egen max_grade_bimonth =max(grade_bimonth), by (youthid)
 bysort class: tab max_grade_bimonth
 
 * I fill in the bimonths with the minimum (gives priority to singlehood)
-bysort youthid grade_bimonth: egen spell_relat = min(spell_relationship)
+bysort youthid grade_bimonth: egen spell_relat = min(spell_relat)
 label values spell_relat spell_rel
 fre spell_relat
 fre spell_relationship
@@ -847,7 +847,7 @@ use "$TEMP\relationship2.dta", clear
 
 forvalues j = 1/9 {
 cap drop count_relationship`j'
-egen count_relationship`j' = total(spell_relationship == `j'), by(youthid)
+egen count_relationship`j' = total(spell_relat == `j'), by(youthid)
 tab count_relationship`j'
 } 
 
@@ -871,7 +871,7 @@ drop if grade_bimonth ==.
 
 
 * Some descriptive statistics 
-tab   grade_bimonth spell_relationship , matcell(table)  matrow(names)  m
+tab   grade_bimonth spell_relat , matcell(table)  matrow(names)  m
 putexcel set "$DESKTOP\Relationship", modify sheet("Overall") 
 putexcel B1 = matrix(table), names hcenter
 putexcel B2 = matrix(names)
@@ -935,7 +935,7 @@ local years  "2006 2007 2008 2009 2010 2011 2012  "
 
 foreach year in `years' {
     * Tabulate missing data by birth year
-    quietly tab   grade_bimonth  spell_relationship if class == `year',  matcell(table)  matrow(names)  m
+    quietly tab   grade_bimonth  spell_relat if class == `year',  matcell(table)  matrow(names)  m
     putexcel set "$DESKTOP\Relationship", modify sheet("Class`year'")
 	putexcel B1 = matrix(table), names hcenter
     putexcel B2 = matrix(names)
@@ -1016,7 +1016,7 @@ sort youthid begincm
 
 * Declare data to be time series 
 tsset youthid begincm 
-tsspell spell_relationship
+tsspell spell_relat
 
 
 
@@ -1028,7 +1028,6 @@ egen row_number = seq(), by(youthid)
 
 * length of the sequences for each sequence 
 tab _seq if _end ==1 
-
 sum _seq if _end ==1, det 
 
 
@@ -1047,7 +1046,7 @@ egen min_sequence = min(_seq), by(youthid)
 
 
 * type of longest and shortest consecutive sequence for each individual 
-gen max_relationship = spell_relationship if max_sequence == _seq 
+gen max_relationship = spell_relat if max_sequence == _seq 
 egen maxmax_relationship = max(max_relationship) , by(youthid)
 drop max_relationship
 rename maxmax_relationship   max_relationship 
@@ -1056,7 +1055,7 @@ label variable max_relationship  "Type of longest consecutive sequence per indiv
 label values max_relationship   spell_rel
 
 
-gen min_relationship = spell_relationship if min_sequence == _seq 
+gen min_relationship = spell_relat if min_sequence == _seq 
 egen minmin_relationship = max(min_relationship) , by(youthid)
 drop min_relationship
 rename minmin_relationship   min_relationship 
@@ -1069,7 +1068,7 @@ fre min_relationship if begincm == min_begincm
 
 forvalues j = 1/9 {
 by youthid: gen cons_relationship`j'  = 0
-replace cons_relationship`j' = _seq if _end ==1 & spell_relationship == `j'
+replace cons_relationship`j' = _seq if _end ==1 & spell_relat == `j'
 egen maxcons_relationship`j' = max(cons_relationship`j'), by(youthid)
 drop cons_relationship`j' 
 rename maxcons_relationship`j'  cons_relationship`j'
@@ -1087,7 +1086,7 @@ label variable cons_relationship8 "N conseq months in Cohab: unclear"
 
 
 * Identify the first spell per individual
-by youthid: gen first_relationship = spell_relationship if _spell == 1 
+by youthid: gen first_relationship = spell_relat if _spell == 1 
 egen max_first_relationship  = max(first_relationship), by(youthid)
 drop first_relationship
 rename max_first_relationship first_relationship
@@ -1097,7 +1096,7 @@ label values  first_relationship spell_rel
 * Identify the last spell per individual
 egen N_spells = max(_spell), by (youthid)
 
-by youthid: gen last_relationship = spell_relationship if _spell == N_spells 
+by youthid: gen last_relationship = spell_relat if _spell == N_spells 
 egen min_last_relationship = min(last_relationship), by(youthid)
 drop last_relationship
 rename min_last_relationship last_relationship
