@@ -654,7 +654,7 @@ destring spell_rel, ignore(".") replace
 recode spell_rel (0 = 0 "Single") ///
 (1 = 1 "Rel: nat-origin") (2 = 2 "Rel: mig-origin") ///
 (13 31 3 = 3 "Cohab: nat-origin") (23 32 = 4 "Cohab: mig-origin") ///
-(-2 = -2 "Post-interview") (-1 =- 1"Missing/single") , ///
+(-2 = -2 "Post-interview") (-1 = -1 "Missing/single") , ///
 gen(spell_relationship) label(spell_rel)
 
 ta spell_relationship
@@ -898,12 +898,13 @@ replace grade= grade+8
 egen max_grade_bimonth =max(grade_bimonth), by (youthid)
 bysort class: tab max_grade_bimonth
 
-* I fill in the bimonths with the minimum (gives priority to singlehood)
-bysort youthid grade_bimonth: egen spell_relat = min(spell_relat)
+* I fill in the bimonths with the maximum (gives priority to cohabitation)
+bysort youthid grade_bimonth: egen spell_relat = max(spell_relationship)
+bysort youthid grade_bimonth: egen spell_relat_2 = max(spell_relationship_2)
 label values spell_relat spell_rel
 fre spell_relat
-fre spell_relationship
-
+label values spell_relat_2 spell_rel
+fre spell_relat_2
 
 save "$TEMP\relationship2.dta", replace 
 
